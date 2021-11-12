@@ -1,25 +1,39 @@
 import logo from './logo.svg';
 import './App.css';
+import Job_Form from './Components/Job_form';
+import JobsList from './Components/JobsList';
+import { useState, useEffect } from "react";
+
 
 function App() {
+  const [jobs, setJobs] = useState([]);
+
+    useEffect(()=>{
+      fetch('http://localhost:5000/articles',{
+        'methods':'GET',
+        headers : {
+          'Content-Type':'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(response => setJobs(response))
+      .catch(error => console.log(error))
+
+    },[]);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <div className="App container m-4">
+      <div className="row">
+      <div className="text-center">
+      <h1>Connecting a React Frontend to a Flask Backend.</h1>
+        </div>
+        </div>
+        <JobsList
+         jobs={jobs}
+         />
+
+         </div>
   );
 }
+
 
 export default App;
