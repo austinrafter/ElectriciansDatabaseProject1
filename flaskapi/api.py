@@ -1,6 +1,4 @@
 from flask import Flask, jsonify
-from flask_restful import Resource, Api
-from json import *
 from flask_cors import CORS, cross_origin
 
 
