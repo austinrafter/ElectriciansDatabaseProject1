@@ -2,16 +2,17 @@ from urllib import request
 from datetime import datetime
 from flask_cors import Flask, jsonify
 from flask_cors import CORS, cross_origin
-#import mysql.connector as mysql
-from flask_sqlalchemy import SQLAlchemy
+import mysql.connector as mysql
+from flaskext.mysql import MySQL
 
 app = Flask(__name__)
-
+db = MYSQL()
 app.config['MYSQL_DATABASE_USER'] = 'austin'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'ThisIsMyPassword'
 app.config['MYSQL_DATABASE_DB'] = 'TestDB2'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-db = SQLAlchemy(app)
+db.init_app(app)
+
 
 
 conn = db.connect()
@@ -338,6 +339,7 @@ def get_all_jobs():
     return jsonify(jobs)
 
 @app.route("/jobs", methods=["GET"], strict_slashes=False)
+@cross_origin()
 def jobs():
     locations = []
     cursor.execute("SELECT SITE_NAME FROM JOB_SITE")
@@ -387,6 +389,7 @@ def get_jobs_by_location(location_name):
         print("Job Name: " +job[0] + "\nLocation: " + location_name +  "\nStart date: " + str(job[1]) + "\n\n")
 
 @app.route("/add_job", methods=["POST"], strict_slashes=False)
+@cross_origin()
 def add_jobs():
     location = request.json['location']
     site_name = request.json['site_name']
@@ -398,6 +401,7 @@ def add_jobs():
               start_date = start_date)
 
 @app.route("/add_work_package", methods=["POST"], strict_slashes=False)
+@cross_origin()
 def add_work_package():
     job = request.json['job']
     work_package_name = request.json['work_package_name']
@@ -408,6 +412,7 @@ def add_work_package():
     work_package = WORK_PACKAGE()
 
 @app.route("/add_employee", methods=["POST"], strict_slashes=False)
+@cross_origin()
 def add_employee():
     first_name = request.json['first_name']
     last_name = request.json['last_name']
