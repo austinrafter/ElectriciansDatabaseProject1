@@ -1,6 +1,3 @@
-
-
-
 class Jobs(db.Model):
     location = ''
     site_name = ''
