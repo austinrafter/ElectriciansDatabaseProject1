@@ -1,61 +1,19 @@
 from urllib import request
 from datetime import datetime
-import sys
 from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import  sql
-import os
+from sqlalchemy import create_engine
+from models import JOB, WORK_PACKAGE, EMPLOYEE
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://austin:ThisIsMyPassword@localhost/TestDB2'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-
-app.config['MYSQL_DATABASE_USER'] = 'austin'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'ThisIsMyPassword'
-app.config['MYSQL_DATABASE_DB'] = 'TestDB2'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-
-
-engine = create_engine()
-conn = db.session
-cursor = conn.execute("SELECT LOCATION_ID FROM JOB_SITE").cursor()
-
-class JOB(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    location_id = db.Column(db.Integer, db.ForeignKey('location.id'),
-                            nullable=False)
-    site_name = db.Column(db.String, unique=True, nullable=False)
-    start_date = db.Column(db.datetime, unique = False, nullable=False)
-
-    def __init__(self, site_name, start_date):
-        self.site_name = site_name
-        self.start_date = start_date
-
-class EMPLOYEE(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String, unique=False, nullable=False)
-    last_name = db.Column(db.String, unique=False, nullable=False)
-    address = db.Column(db.String, unique=False, nullable=False)
-    city = db.Column(db.String, unique=False, nullable=False)
-    state = db.Column(db.String, unique=False, nullable=False)
-    zip = db.Column(db.Integer, unique=False, nullable=False)
-    position = db.Column(db.String, unique=False, nullable=False)
-    pay_rate = db.Column(db.String, unique=False, nullable=False)
-    years_employed = db.Column(db.Integer, unique=False, nullable=False)
-
-class WORK_PACKAGE(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    job = db.Column(db.String, unique=False, nullable=False)
-    work_package_name = db.Column(db.String, unique=True, nullable=False)
-    price_of_work = 0
-    hours_alloted = 0
-    hours_used = 0
-class LOCATION(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-
-
+engine = create_engine('mysql+mysqlconnector://austin:ThisIsMyPassword@localhost/TestDB2')
+conn = engine.raw_connection()
+cursor = conn.cursor()
 
 def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,position_name, job_site):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
