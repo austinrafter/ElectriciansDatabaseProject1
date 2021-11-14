@@ -11,6 +11,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://austin:ThisIsMyPassword@localho
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
+cors = CORS()
+
 engine = create_engine('mysql+mysqlconnector://austin:ThisIsMyPassword@localhost/TestDB2')
 conn = engine.raw_connection()
 cursor = conn.cursor()
@@ -299,7 +301,6 @@ def get_all_jobs():
     return jsonify(jobs)
 
 @app.route("/jobs", methods=["GET"], strict_slashes=False)
-@cross_origin()
 def jobs():
     locations = []
     cursor.execute("SELECT SITE_NAME FROM JOB_SITE")
@@ -317,13 +318,13 @@ def jobs():
     job_info = [[]]
     for x,y,z in zip(jobs_name,location_names,start_dates):
         job_info.append([x,y,z])
-    jobs_array = []
+    jobs = []
     for x in job_info:
-        job = JOB(site_name = x[0],
+        job = JOB(site = x[0],
                   location = x[1],
-                  start_date = x[2])
-        jobs_array.append(job)
-        print(jobs_array)
+                  start = x[2])
+        jobs.append(job)
+        print(jobs)
 
     return jsonify(jobs)
 
@@ -352,13 +353,13 @@ def get_jobs_by_location(location_name):
 @cross_origin()
 def add_jobs():
     location = request.json['location']
-    site_name = request.json['site_name']
-    start_date = request.join['start_date']
+    site = request.json['site']
+    start = request.join['start']
     insert_into_location(location)
-    insert_into_job_site(location, site_name, start_date)
+    insert_into_job_site(location, site, start)
     job = JOB(location = location,
-              site_name = site_name,
-              start_date = start_date)
+              site = site,
+              start = start)
 
 @app.route("/add_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -393,7 +394,7 @@ def add_employee():
     address = address,
     city = city,
     state = state,
-    zip = zip,
+    zip = zipcode,
     position = position,
     pay_rate = pay_rate,
     years_employed = years_employed)
