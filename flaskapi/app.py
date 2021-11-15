@@ -291,8 +291,8 @@ def delete_from_material_in_work_package(inventory_name, work_package_name, job_
     cursor.execute("DELETE FROM MATERIAL_IN_WORK_PACKAGE WHERE WORK_PACKAGE_ID = ? AND INVENTORY_ID = ? AND AMOUNT_ALLOTED = ? AND AMOUNT_USED = ?;", [inventory[0], work_package[0], material_amount_issued, material_amount_used])
     conn.commit()
 
-@app.route('/')
-@cross_origin()
+#@app.route('/')
+#@cross_origin()
 def get_all_jobs():
     locations = []
     cursor.execute("SELECT SITE_NAME FROM JOB_SITE")
@@ -301,10 +301,12 @@ def get_all_jobs():
     location_id = cursor.fetchall()
     return jsonify(jobs)
 
-@app.route("/jobs")
+@app.route("/" , methods=["GET"], strict_slashes=False)
 @cross_origin()
 def jobs():
     locations = []
+    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE")
+    jobs_id = cursor.fetchall()
     cursor.execute("SELECT SITE_NAME FROM JOB_SITE")
     jobs_name = cursor.fetchall()
     cursor.execute("SELECT LOCATION_ID FROM JOB_SITE")
@@ -319,21 +321,23 @@ def jobs():
         location_names.append(name[0])
     job_info = []
     for x in range(len(jobs_name)):
-        job_info.append([str(start_dates[x]),jobs_name[x],location_names[x]])
+        job_info.append([jobs_id[x],str(start_dates[x]),jobs_name[x],location_names[x]])
     jobs = []
     for x in job_info:
-        job = Jobs(x[0],x[1],x[2])
+        job = Jobs(x[0],x[1],x[2],x[3])
         add_job = json.dumps(job.__dict__)
         jobs.append(add_job)
     return jsonify(jobs)
 
-@app.route("/work_package")
+@app.route("/work_package" , methods=["GET"], strict_slashes=False)
 @cross_origin()
 def work_packages():
     job = request.json['job']
     locations = []
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=%s", [job])
     job_id = cursor.fetchone()
+    cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE JOB_SITE_ID = %s", [job_id[0]])
+    ids = cursor.fetchall()
     cursor.execute("SELECT WORK_PACKAGE_NAME FROM WORK_PACKAGE WHERE JOB_SITE_ID=%s", [job_id[0]])
     work_package_names = cursor.fetchall()
     cursor.execute("SELECT PRICE_OF_WORK FROM WORK_PACKAGE WHERE JOB_SITE_ID=%s", [job_id[0]])
@@ -344,10 +348,10 @@ def work_packages():
     hours_used_for_each = cursor.fetchall()
     work_package_info = []
     for x in range(len(work_package_names)):
-        work_package_info.append(job, work_package_names[x], prices_of_work[x], hours_alloted_for_each[x], hours_used_for_each[x])
+        work_package_info.append([ids[x],job, work_package_names[x], prices_of_work[x], hours_alloted_for_each[x], hours_used_for_each[x]])
     work_packages = []
     for x in work_package_info:
-        job = Jobs(x[0], x[1], x[2],x[3,x[4]])
+        job = Jobs(x[0], x[1], x[2],x[3,x[4],x[5]])
         add_work_package = json.dumps(job.__dict__)
         work_packages.append(add_work_package)
     return jsonify(work_packages)

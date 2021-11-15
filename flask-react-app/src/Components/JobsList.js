@@ -1,3 +1,5 @@
+import { Button } from 'react-bootstrap';
+
 const JobsList = (props) => {
 
     return (
@@ -6,8 +8,8 @@ const JobsList = (props) => {
         {props.jobs && props.jobs.map(job =>{
         return (
 
-        <div >
-        <h2 className="text-primary"> { job.site } </h2>
+        <div key={job.job_id} >
+        <Button className="text-primary"> { job.site } </Button>
         <p> { job.location } </p>
         <p> { job.start } </p>
         <hr/>
