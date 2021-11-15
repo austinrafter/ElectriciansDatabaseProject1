@@ -9,7 +9,7 @@ function App() {
   const [jobs, setJobs] = useState([]);
 
     useEffect(()=>{
-      fetch('http://localhost:5000/articles',{
+      fetch('http://localhost:5000/jobs',{
         'methods':'GET',
         headers : {
           'Content-Type':'application/json'

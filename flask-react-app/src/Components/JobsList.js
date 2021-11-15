@@ -7,7 +7,7 @@ const JobsList = (props) => {
         return (
 
         <div >
-        <h2 > { job.site } </h2>
+        <h2 className="text-primary"> { job.site } </h2>
         <p> { job.location } </p>
         <p> { job.start } </p>
         <hr/>

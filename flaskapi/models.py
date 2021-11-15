@@ -1,14 +1,16 @@
-class JOB():
-    location = ''
-    site = ''
+import json
+from json import JSONEncoder
+
+class Jobs():
     start = ''
-
+    site = ''
+    location = ''
     def __init__(self, site, start, location):
-        self.location_name = location_name
-        self.site = site
         self.start = start
+        self.site = site
+        self.location = location
 
-class EMPLOYEE():
+class Employees():
     first_name = ''
     last_name = ''
     address = ''
@@ -30,7 +32,7 @@ class EMPLOYEE():
         self.pay_rate = pay_rate
         self.years_employed = years_employed
 
-class WORK_PACKAGE():
+class WorkPackages():
     job = ''
     work_package_name = ''
     price_of_work = 0
@@ -43,3 +45,7 @@ class WORK_PACKAGE():
         self.price_of_work = price_of_work
         self.hours_alloted = hours_alloted
         self.hours_used = hours_used
+
+class JsonEncoder(JSONEncoder):
+        def default(self, o):
+            return o.__dict__
