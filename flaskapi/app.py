@@ -85,7 +85,7 @@ def check_position():
     else:
          return jsonify(employee)
 
-@app.route("/hours_used" , methods=["GET"], strict_slashes=False)
+@app.route("/hours_used" , methods=["POST", "GET"], strict_slashes=False)
 @cross_origin()
 def change_hours_used_on_work_package(job_name, work_package_name, hours_used):
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=?", [job_name])
