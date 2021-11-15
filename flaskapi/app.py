@@ -18,7 +18,7 @@ engine = create_engine('mysql+mysqlconnector://austin:ThisIsMyPassword@localhost
 conn = engine.raw_connection()
 cursor = conn.cursor()
 
-def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,position_name, job_site):
+def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,position_name):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
@@ -28,7 +28,7 @@ def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,
     cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID=?", [person[0], position[0]])
     check_position= cursor.fetchone()
     if check_position[0] == position[0]:
-        get_foreman_view(job_site)
+        return True
     else:
         print("you are not a foreman and can't view that")
 
@@ -42,7 +42,7 @@ def check_user_position_project_manager(first_name,last_name,Address,city,state,
     cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID= ? ", [person[0], position[0]])
     check_position= cursor.fetchone()
     if check_position[0] == position[0]:
-        get_project_manager_view()
+        return True
     else:
         print("you are not a project manager and can't view that")
 
@@ -56,11 +56,37 @@ def check_user_position_general_manager(first_name,last_name,Address,city,state,
     cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID=?", [person[0], position[0]])
     check_position= cursor.fetchone()
     if check_position[0] == position[0]:
-        get_general_manager_view()
+        return True
     else:
         print("you are not a general manager and can't view that")
 
+@app.route("/position_check" , methods=["GET"], strict_slashes=False)
+@cross_origin()
+def check_position():
+    first_name = request.form['first_name']
+    last_name = request.form['last_name']
+    position = request.form['position']
+    address = request.form['address']
+    city = request.form['city']
+    state = request.form['state']
+    zipcode = request.form['zipcode']
+    years_employed = request.form['years_employed']
+    pay_rate = request.form['pay_rate']
+    employee = Employees(first_name, last_name, address, city, state, zipcode, position, pay_rate, years_employed)
+    if(position == 'Foreman'):
+        check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position)
+        return jsonify(employee)
+    elif(position == 'Project Manager'):
+        check_user_position_project_manager(first_name, last_name, address, city, state, zipcode, position)
+        return jsonify(employee)
+    elif(position == 'General Manager'):
+        check_user_position_general_manager(first_name, last_name, address, city, state, zipcode, position)
+        return jsonify(employee)
+    else:
+         return jsonify(employee)
 
+@app.route("/hours_used" , methods=["GET"], strict_slashes=False)
+@cross_origin()
 def change_hours_used_on_work_package(job_name, work_package_name, hours_used):
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=?", [job_name])
     job_id = cursor.fetchone();
@@ -291,8 +317,8 @@ def delete_from_material_in_work_package(inventory_name, work_package_name, job_
     cursor.execute("DELETE FROM MATERIAL_IN_WORK_PACKAGE WHERE WORK_PACKAGE_ID = ? AND INVENTORY_ID = ? AND AMOUNT_ALLOTED = ? AND AMOUNT_USED = ?;", [inventory[0], work_package[0], material_amount_issued, material_amount_used])
     conn.commit()
 
-#@app.route('/')
-#@cross_origin()
+@app.route('/')
+@cross_origin()
 def get_all_jobs():
     locations = []
     cursor.execute("SELECT SITE_NAME FROM JOB_SITE")
@@ -301,7 +327,7 @@ def get_all_jobs():
     location_id = cursor.fetchall()
     return jsonify(jobs)
 
-@app.route("/" , methods=["GET"], strict_slashes=False)
+@app.route("/jobs" , methods=["GET"], strict_slashes=False)
 @cross_origin()
 def jobs():
     locations = []
@@ -325,9 +351,8 @@ def jobs():
     jobs = []
     for x in job_info:
         job = Jobs(x[0],x[1],x[2],x[3])
-        add_job = json.dumps(job.__dict__)
-        jobs.append(add_job)
-    return jsonify(jobs)
+        jobs.append(job)
+    return jsonify([e.serialize() for e in jobs])
 
 @app.route("/work_package" , methods=["GET"], strict_slashes=False)
 @cross_origin()
@@ -351,10 +376,9 @@ def work_packages():
         work_package_info.append([ids[x],job, work_package_names[x], prices_of_work[x], hours_alloted_for_each[x], hours_used_for_each[x]])
     work_packages = []
     for x in work_package_info:
-        job = Jobs(x[0], x[1], x[2],x[3,x[4],x[5]])
-        add_work_package = json.dumps(job.__dict__)
-        work_packages.append(add_work_package)
-    return jsonify(work_packages)
+        work_package = WorkPackages(x[0], x[1], x[2],x[3,x[4],x[5]])
+        work_packages.append(work_package)
+    return jsonify([e.serialize() for e in work_packages])
 
 
 def get_work_packages_on_job(job_site_name):
@@ -380,41 +404,44 @@ def get_jobs_by_location(location_name):
 @app.route("/add_job", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_jobs():
-    location = request.json['location']
-    site = request.json['site']
-    start = request.join['start']
+    location = request.form['location']
+    site = request.form['site']
+    start = request.form['start']
     insert_into_location(location)
     insert_into_job_site(location, site, start)
     job = Jobs(location,site,start)
+    return jsonify(job)
 
 @app.route("/add_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_work_package():
-    job = request.json['job']
-    work_package_name = request.json['work_package_name']
-    price_of_work = request.json['price_of_work']
-    hours_alloted = request.json['hours_alloted']
-    hours_used = request.json['hours_used']
+    job = request.form['job']
+    work_package_name = request.form['work_package_name']
+    price_of_work = request.form['price_of_work']
+    hours_alloted = request.form['hours_alloted']
+    hours_used = request.form['hours_used']
     insert_into_work_package(job, work_package_name, price_of_work, hours_alloted)
     work_package = WorkPackages(job,work_package_name,price_of_work,hours_alloted,hours_used)
+    return jsonify(work_package)
 
 @app.route("/add_employee", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_employee():
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    years_employed = request.json['years_employed']
-    pay_rate = request.json['pay_rate']
+    first_name = request.form['first_name']
+    last_name = request.form['last_name']
+    position = request.form['position']
+    address = request.form['address']
+    city = request.form['city']
+    state = request.form['state']
+    zipcode = request.form['zipcode']
+    years_employed = request.form['years_employed']
+    pay_rate = request.form['pay_rate']
     if (position == "Inside Wireman") or (position == "Residential Wireman"):
         insert_into_electrician(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
     else:
         insert_into_salaried_employee(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
     employee = Employees( first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed)
+    return jsonify(employee)
 
 
 
