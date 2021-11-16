@@ -12,6 +12,8 @@ const WorkPackagesList = (props) => {
         <h2 variant="text-primary" size="lg">
         { work_package.work_package_name}
          </h2>
+         <h3> Job name </h3>
+         <p> { work_package.job_site } </p>
          <h3> Price of work </h3>
         <p> { work_package.price_of_work } </p>
         <h3> Hours alloted </h3>

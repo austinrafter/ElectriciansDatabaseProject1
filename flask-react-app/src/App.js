@@ -21,6 +21,23 @@ function App() {
   const [jobs, setJobs] = useState([]);
   const [employees, setEmployees] = useState([]);
 
+ // define variables for the present state of the form and another to change its state
+  const [showForm, setShowForm] = useState(false);
+  const [showFormTwo, setShowFormTwo] = useState(false);
+
+ // toggle between the two states,visible and hidden
+  const toggleShowForm = () => {
+    setShowForm(!showForm);
+  }
+
+  const toggleShowFormTwo = () => {
+    setShowFormTwo(!showFormTwo);
+  }
+
+
+
+
+
     useEffect(()=>{
       fetch('http://localhost:5000/jobs',{
         'methods':'GET',
@@ -41,13 +58,34 @@ function App() {
       <h1>Welcome to SJ Electric Company.</h1>
         </div>
         </div>
-        <h2>Are you supposed to be here? find out</h2>
-        <PositionAuthenticationForm salariedEmployee = {salariedEmployee} />
+        <button
+          onClick={toggleShowForm}
+          className="btn btn-primary"
+           >
+             Are you a foreman, project manager, or general manager? See information about jobs here.
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+        {showForm && (
+          <PositionAuthenticationForm
+          salariedEmployee = {salariedEmployee}
+            />
+            )}
         <h2>Jobs</h2>
         <JobsList
          jobs={jobs}
          />
-         <JobForm insertedJob={insertedJob} />
+          <button
+          onClick={toggleShowFormTwo}
+          className="btn btn-primary"
+           >
+             Add a job
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+         {showFormTwo && (
+          <JobForm
+          insertedJob = {insertedJob}
+            />
+            )}
 
          </div>
 
