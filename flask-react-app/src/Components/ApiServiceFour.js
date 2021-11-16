@@ -1,6 +1,6 @@
 export default class APIServiceFour{
     static CheckPosition(body){
-    return fetch('http://localhost:5000/check_salaried_employee',{
+    return fetch('http://localhost:5000/position_check',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

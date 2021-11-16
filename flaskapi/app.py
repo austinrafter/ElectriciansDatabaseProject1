@@ -1,11 +1,12 @@
 from urllib import request;
 from datetime import datetime;
-from flask import Flask, jsonify;
+from flask import Flask, jsonify, session;
 from flask_cors import CORS, cross_origin;
 from flask_sqlalchemy import SQLAlchemy;
 from sqlalchemy import create_engine;
 from models import Jobs, WorkPackages, Employees;
-import json
+
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://austin:ThisIsMyPassword@localhost/TestDB2'
@@ -72,6 +73,7 @@ def check_position():
     zipcode = request.form['zipcode']
     years_employed = request.form['years_employed']
     pay_rate = request.form['pay_rate']
+    session['employee_position'] = position
     employee = Employees(first_name, last_name, address, city, state, zipcode, position, pay_rate, years_employed)
     if(position == 'Foreman'):
         check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position)
@@ -85,10 +87,13 @@ def check_position():
     else:
          return jsonify(employee)
 
-@app.route("/hours_used" , methods=["POST", "GET"], strict_slashes=False)
+@app.route("/hours_used" , methods=["POST"], strict_slashes=False)
 @cross_origin()
-def change_hours_used_on_work_package(job_name, work_package_name, hours_used):
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=?", [job_name])
+def change_hours_used_on_work_package():
+    job = request.form['job']
+    work_package_name = request.form['work_package_name']
+    hours_used = request.form['hours_used']
+    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=?", [job])
     job_id = cursor.fetchone();
     cursor.execute("UPDATE WORK_PACKAGE SET HOURS_USED = ? WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [hours_used,work_package_name, job_id[0]])
     conn.commit()
@@ -358,6 +363,7 @@ def jobs():
 @cross_origin()
 def work_packages():
     job = request.json['job']
+    session['job_chosen'] = job
     locations = []
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=%s", [job])
     job_id = cursor.fetchone()

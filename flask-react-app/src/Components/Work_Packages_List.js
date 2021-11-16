@@ -1,6 +1,15 @@
 import { Button } from 'react-bootstrap';
+import React from 'react';
+
+
+function WorkPackagesJob(props){
+const search = props.location.search;
+const site = new URLSearchParams(search).get('site');
+return site;
+}
 
 const WorkPackagesList = (props) => {
+
 
     return (
         <div className="mt-2">
@@ -8,15 +17,16 @@ const WorkPackagesList = (props) => {
         {props.work_packages && props.work_packages.map(work_package =>{
         return (
 
-        <div key= { work_package.work_package_id\ }>
+        <div key= { work_package.work_package_id }>
         <Button variant="text-primary" size="lg">
-        { work_package.work_package_name\}
+        { work_package.work_package_name}
          </Button>
-        <p> { work_package.price_of_work\ } </p>
-        <p> { work_package.hours_alloted\ } </p>
-        <p> { work_package.hours_used\ } </p>
+        <p> { work_package.price_of_work } </p>
+        <p> { work_package.hours_alloted } </p>
+        <p> { work_package.hours_used } </p>
         <hr/>
         </div>
+
     )
 
         })}

@@ -6,7 +6,7 @@ const Work_Package_Form = (props) => {
     const [hours_used, setHoursUsed] = useState('')
 
     const insertHoursUsed = () =>{
-    APIService.InsertWorkPackage({hours_used})
+    APIServiceTwo.InsertWorkPackage({hours_used})
     .then((response) => props.insertedWorkPackage(response))
           .catch(error => console.log('error',error))
           }
