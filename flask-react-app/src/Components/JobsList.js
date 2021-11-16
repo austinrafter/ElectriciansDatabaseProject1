@@ -4,10 +4,12 @@ import WorkPackagesList from '../Components/Work_Packages_List';
 import APIServiceFive from '../Components/APIServiceFive'
 
 
+
 const JobsList = (props) => {
 const [jobSite, setJobSite] = useState({
 "job_site" : "job" })
 const [work_packages, setWorkPackages] = useState([]);
+
 
 const workPackages = (work_package) =>{
     const new_WorkPackage = [...work_packages,work_package]
@@ -16,7 +18,7 @@ const workPackages = (work_package) =>{
 
 const checkPosition = () =>{
     APIServiceFive.InsertJobName({jobSite})
-    .then((response) => props.workPackages(response))
+    .then((response) => setWorkPackages(response))
          .catch(error => console.log('error',error))
           }
 
@@ -28,22 +30,6 @@ const checkPosition = () =>{
     console.log(jobSite)
 
         }
-
-useEffect(()=>{
-      fetch('http://localhost:5000/work_packages',{
-        'methods':'GET',
-        headers : {
-          'Content-Type':'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(response => setWorkPackages(response))
-      .catch(error => console.log(error))
-      return ( ()=>{
-         console.log('cleanup on change of job name props');
-      });
-    },[jobSite]);
-
 
     return (
         <div className="mt-2">
@@ -60,7 +46,6 @@ useEffect(()=>{
         <Button className="text-primary" name="jobSite" onClick = {handleSubmit} value = {job.site}> { "work packages"  } </Button>
         <hr/>
         <WorkPackagesList work_packages={work_packages}/>
-        <WorkPackagesList workPackages={workPackages}/>
         <hr/>
         </div>
     )

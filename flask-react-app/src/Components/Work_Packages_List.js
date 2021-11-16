@@ -9,11 +9,14 @@ const WorkPackagesList = (props) => {
         return (
 
         <div key= { work_package.work_package_id }>
-        <Button variant="text-primary" size="lg">
+        <h2 variant="text-primary" size="lg">
         { work_package.work_package_name}
-         </Button>
+         </h2>
+         <h3> Price of work </h3>
         <p> { work_package.price_of_work } </p>
+        <h3> Hours alloted </h3>
         <p> { work_package.hours_alloted } </p>
+        <h3> Price hours used </h3>
         <p> { work_package.hours_used } </p>
         <hr/>
         </div>

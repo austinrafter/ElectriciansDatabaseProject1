@@ -133,11 +133,7 @@ class GeneralManager():
         self.total_profits = total_profits
         self.number_of_days_on_project = number_of_days_on_project
 
-class JobSiteName():
-    job_site = ''
 
-    def __init__(self, job_site):
-        self.job_site = job_site
 
 
 
