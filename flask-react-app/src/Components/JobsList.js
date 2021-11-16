@@ -24,9 +24,10 @@ const checkPosition = () =>{
 
     const handleSubmit=(event)=>{
     //event.preventDefault()
+    console.log(jobSite)
     const changedReason = event.target.getAttribute('job_site');
-    checkPosition()
     setJobSite({job_site : event.target.value} )
+    checkPosition()
     console.log(jobSite)
 
         }
@@ -43,10 +44,13 @@ const checkPosition = () =>{
         <p> { job.location } </p>
         <h4> "Start Date" </h4>
         <p> { job.start } </p>
-        <Button className="text-primary" name="jobSite" onClick = {handleSubmit} value = {job.site}> { "work packages"  } </Button>
+        <Button className="text-primary" onClick = {handleSubmit} value = {job.site}> { "work packages"  } </Button>
         <hr/>
+        <hr/>
+        <div>
         <WorkPackagesList work_packages={work_packages}/>
-        <hr/>
+
+        </div>
         </div>
     )
 
