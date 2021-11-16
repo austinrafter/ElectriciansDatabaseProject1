@@ -57,15 +57,15 @@ class Employees():
 
 class WorkPackages():
     work_package_id = 0
-    job = ''
+    job_site = ''
     work_package_name = ''
     price_of_work = 0
     hours_alloted = 0
     hours_used = 0
 
-    def __init__(self, work_package_id,job, work_package_name, price_of_work, hours_alloted, hours_used):
+    def __init__(self, work_package_id,job_site, work_package_name, price_of_work, hours_alloted, hours_used):
         self.work_package_id = work_package_id
-        self.job = job
+        self.job_site = job_site
         self.work_package_name = work_package_name
         self.price_of_work = price_of_work
         self.hours_alloted = hours_alloted
@@ -74,7 +74,7 @@ class WorkPackages():
     def serialize(self):
         return {
             'work_package_id': self.work_package_id,
-            'job': self.job,
+            'job_site': self.job_site,
             'work_package_name': self.work_package_name,
             'price_of_work': self.price_of_work,
             'hours_alloted': self.hours_alloted,
@@ -132,3 +132,12 @@ class GeneralManager():
         self.amount_made = amount_made
         self.total_profits = total_profits
         self.number_of_days_on_project = number_of_days_on_project
+
+class JobSiteName():
+    job_site = ''
+
+    def __init__(self, job_site):
+        self.job_site = job_site
+
+
+

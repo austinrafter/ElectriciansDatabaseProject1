@@ -1,16 +1,7 @@
 import { Button } from 'react-bootstrap';
 import React from 'react';
 
-
-function WorkPackagesJob(props){
-const search = props.location.search;
-const site = new URLSearchParams(search).get('site');
-return site;
-}
-
 const WorkPackagesList = (props) => {
-
-
     return (
         <div className="mt-2">
         {/* Display the article details if article is not None */}
@@ -26,9 +17,7 @@ const WorkPackagesList = (props) => {
         <p> { work_package.hours_used } </p>
         <hr/>
         </div>
-
     )
-
         })}
     </div>
     )

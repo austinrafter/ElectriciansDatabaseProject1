@@ -1,10 +1,10 @@
-from urllib import request;
+from flask import request;
 from datetime import datetime;
 from flask import Flask, jsonify, session;
 from flask_cors import CORS, cross_origin;
 from flask_sqlalchemy import SQLAlchemy;
 from sqlalchemy import create_engine;
-from models import Jobs, WorkPackages, Employees;
+from models import Jobs, WorkPackages, Employees, JobSiteName;
 
 
 
@@ -322,7 +322,7 @@ def delete_from_material_in_work_package(inventory_name, work_package_name, job_
     cursor.execute("DELETE FROM MATERIAL_IN_WORK_PACKAGE WHERE WORK_PACKAGE_ID = ? AND INVENTORY_ID = ? AND AMOUNT_ALLOTED = ? AND AMOUNT_USED = ?;", [inventory[0], work_package[0], material_amount_issued, material_amount_used])
     conn.commit()
 
-@app.route('/')
+@app.route("/")
 @cross_origin()
 def get_all_jobs():
     locations = []
@@ -359,32 +359,36 @@ def jobs():
         jobs.append(job)
     return jsonify([e.serialize() for e in jobs])
 
-@app.route("/work_package" , methods=["GET"], strict_slashes=False)
+@app.route("/work_packages" , methods=["POST", "GET"], strict_slashes=False)
 @cross_origin()
 def work_packages():
-    job = request.json['job']
-    session['job_chosen'] = job
-    locations = []
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=%s", [job])
-    job_id = cursor.fetchone()
-    cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE JOB_SITE_ID = %s", [job_id[0]])
-    ids = cursor.fetchall()
-    cursor.execute("SELECT WORK_PACKAGE_NAME FROM WORK_PACKAGE WHERE JOB_SITE_ID=%s", [job_id[0]])
-    work_package_names = cursor.fetchall()
-    cursor.execute("SELECT PRICE_OF_WORK FROM WORK_PACKAGE WHERE JOB_SITE_ID=%s", [job_id[0]])
-    prices_of_work = cursor.fetchall()
-    cursor.execute("SELECT HOURS_ALLOTED FROM WORK_PACKAGE WHERE JOB_SITE_ID=%s", [job_id[0]])
-    hours_alloted_for_each = cursor.fetchall()
-    cursor.execute("SELECT HOURS_USED FROM WORK_PACKAGE WHERE JOB_SITE_ID=%s", [job_id[0]])
-    hours_used_for_each = cursor.fetchall()
-    work_package_info = []
-    for x in range(len(work_package_names)):
-        work_package_info.append([ids[x],job, work_package_names[x], prices_of_work[x], hours_alloted_for_each[x], hours_used_for_each[x]])
     work_packages = []
-    for x in work_package_info:
-        work_package = WorkPackages(x[0], x[1], x[2],x[3,x[4],x[5]])
-        work_packages.append(work_package)
+    if request.method == 'POST':
+        jobSite = request.get_json()
+        jobSite = jobSite.get('jobSite')
+        jobSite = jobSite.get('job_site')
+        print(jobSite)
+        locations = []
+        cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=%s", [jobSite[0]])
+        job_id = cursor.fetchone()
+        cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE JOB_SITE_ID = %s", [job_id])
+        ids = cursor.fetchall()
+        cursor.execute("SELECT WORK_PACKAGE_NAME FROM WORK_PACKAGE WHERE JOB_SITE_ID=%s", [job_id])
+        work_package_names = cursor.fetchall()
+        cursor.execute("SELECT PRICE_OF_WORK FROM WORK_PACKAGE WHERE JOB_SITE_ID=%s", [job_id])
+        prices_of_work = cursor.fetchall()
+        cursor.execute("SELECT HOURS_ALLOTED FROM WORK_PACKAGE WHERE JOB_SITE_ID=%s", [job_id])
+        hours_alloted_for_each = cursor.fetchall()
+        cursor.execute("SELECT HOURS_USED FROM WORK_PACKAGE WHERE JOB_SITE_ID=%s", [job_id])
+        hours_used_for_each = cursor.fetchall()
+        work_package_info = []
+        for x in range(len(work_package_names)):
+            work_package_info.append([ids[x],jobSite, work_package_names[x], prices_of_work[x], hours_alloted_for_each[x], hours_used_for_each[x]])
+        for x in work_package_info:
+            work_package = WorkPackages(x[0], x[1], x[2],x[3,x[4],x[5]])
+            work_packages.append(work_package)
     return jsonify([e.serialize() for e in work_packages])
+
 
 
 def get_work_packages_on_job(job_site_name):

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import APIService from '../Components/ApiService.js'
 
 
-const Job_Form = (props) => {
+const JobForm = (props) => {
     const [location, setLocation] = useState('')
     const [site_name, setSiteName] = useState('')
     const [start_date, setStartDate] = useState('')
@@ -65,4 +65,4 @@ const Job_Form = (props) => {
       )}
 
 
-export default Job_Form;
+export default JobForm;

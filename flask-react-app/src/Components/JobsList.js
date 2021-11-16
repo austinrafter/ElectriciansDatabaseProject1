@@ -1,15 +1,33 @@
 import { Button } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
 import WorkPackagesList from '../Components/Work_Packages_List';
+import APIServiceFive from '../Components/APIServiceFive'
+
 
 const JobsList = (props) => {
-const [siteName, setSiteName] = useState()
+const [jobSite, setJobSite] = useState({
+"job_site" : "job" })
 const [work_packages, setWorkPackages] = useState([]);
 
-const handleClick = (event) => {
-const site = event.target.value;
-siteName = site
-}
+const workPackages = (work_package) =>{
+    const new_WorkPackage = [...work_packages,work_package]
+    setWorkPackages(new_WorkPackage)
+  }
+
+const checkPosition = () =>{
+    APIServiceFive.InsertJobName({jobSite})
+    .then((response) => props.workPackages(response))
+         .catch(error => console.log('error',error))
+          }
+
+    const handleSubmit=(event)=>{
+    //event.preventDefault()
+    const changedReason = event.target.getAttribute('job_site');
+    checkPosition()
+    setJobSite({job_site : event.target.value} )
+    console.log(jobSite)
+
+        }
 
 useEffect(()=>{
       fetch('http://localhost:5000/work_packages',{
@@ -21,7 +39,10 @@ useEffect(()=>{
       .then(response => response.json())
       .then(response => setWorkPackages(response))
       .catch(error => console.log(error))
-    },[]);
+      return ( ()=>{
+         console.log('cleanup on change of job name props');
+      });
+    },[jobSite]);
 
 
     return (
@@ -36,9 +57,11 @@ useEffect(()=>{
         <p> { job.location } </p>
         <h4> "Start Date" </h4>
         <p> { job.start } </p>
-        <Button className="text-primary" onClick = {handleClick} value = {job.site}> { "work packages"  } </Button>
+        <Button className="text-primary" name="jobSite" onClick = {handleSubmit} value = {job.site}> { "work packages"  } </Button>
         <hr/>
-        <WorkPackagesList work_packages = {work_packages}/>
+        <WorkPackagesList work_packages={work_packages}/>
+        <WorkPackagesList workPackages={workPackages}/>
+        <hr/>
         </div>
     )
 
