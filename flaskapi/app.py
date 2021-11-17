@@ -130,6 +130,7 @@ def get_project_manager_view(job_site_name):
     for x in result:
         project_manager = ProjectManager(i+1, x[0], x[1], x[2], x[3], x[4], x[5], x[6])
         project_managers.append(project_manager)
+    print(project_managers)
     return project_managers
 
 def get_general_manager_view(job_site_name):

@@ -14,15 +14,15 @@ const PositionAuthenticationFormTwo = (props) => {
     const [years_employed, setYearsEmployed] = useState('')
     const [job_to_view, setJobToView] = useState('')
 
-    const checkPosition = () =>{
+    const checkPositionTwo = () =>{
     APIServiceFour.CheckPosition({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
-    .then((response) => props.salariedEmployee(response))
+    .then((response) => props.findProjectManager(response))
           .catch(error => console.log('error',error))
           }
 
     const handleSubmit=(event)=>{
           event.preventDefault()
-          checkPosition()
+          checkPositionTwo()
           setFirstName('')
           setLastName('')
           setAddress('')

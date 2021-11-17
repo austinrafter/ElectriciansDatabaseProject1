@@ -12,30 +12,31 @@ import PositionAuthenticationFormThree from './Components/AuthenticateSalariedEm
 
 
 function App() {
- const insertedJob = (job) =>{
-    const new_jobs = [...jobs,job]
-    setJobs(new_jobs)
-  }
-
-  const findForeman = (foreman) =>{
-    const new_salariedEmployee = [...foremans,foreman]
-    setForemans(new_salariedEmployee)
-  }
-
-   const findProjectManager = (project_manager) =>{
-    const new_salariedEmployee = [...project_managers,project_manager]
-    setProjectManagers(new_salariedEmployee)
-  }
-
-   const findGeneralManager = (general_manager) =>{
-    const new_salariedEmployee = [...general_managers,general_manager]
-    setGeneralManagers(new_salariedEmployee)
-  }
 
   const [jobs, setJobs] = useState([]);
   const [foremans, setForemans] = useState([]);
   const [project_managers, setProjectManagers] = useState([]);
   const [general_managers, setGeneralManagers] = useState([]);
+
+  const insertedJob = (job) =>{
+    const new_jobs = [...jobs,job]
+    setJobs(new_jobs)
+  }
+
+    const findForeman = (foreman) =>{
+    const new_salariedEmployee = [...foremans,foreman]
+    setForemans(new_salariedEmployee)
+  }
+
+   const findProjectManager = (project_manager) =>{
+    const new_projectManager = [...project_managers,project_manager]
+    setProjectManagers(new_projectManager)
+  }
+
+   const findGeneralManager = (general_manager) =>{
+    const new_generalManager = [...general_managers,general_manager]
+    setGeneralManagers(new_generalManager)
+  }
 
 
  // define variables for the present state of the form and another to change its state
@@ -93,8 +94,10 @@ function App() {
           findForeman = {findForeman}
             />
             )}
+            <ForemansList foremans = {foremans} />
+            <hr/>
               <button
-          onClick={toggleShowForm}
+          onClick={toggleShowFormThree}
           className="btn btn-primary"
            >
              Are you a project manager? See information about jobs here.
@@ -105,8 +108,10 @@ function App() {
           findProjectManager = {findProjectManager}
             />
             )}
+            <ProjectManagersList project_managers = {project_managers} />
+            <hr/>
               <button
-          onClick={toggleShowForm}
+          onClick={toggleShowFormFour}
           className="btn btn-primary"
            >
              Are you a general manager? See information about jobs here.
@@ -117,8 +122,6 @@ function App() {
           findGeneralManager = {findGeneralManager}
             />
             )}
-        <ForemansList foremans = {foremans} />
-        <ProjectManagersList project_managers = {project_managers} />
         <GeneralManagersList general_managers = {general_managers} />
         <h2>Jobs</h2>
         <JobsList

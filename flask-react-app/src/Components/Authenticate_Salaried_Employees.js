@@ -16,7 +16,7 @@ const PositionAuthenticationForm = (props) => {
 
     const checkPosition = () =>{
     APIServiceFour.CheckPosition({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
-    .then((response) => props.salariedEmployee(response))
+    .then((response) => props.findForeman(response))
           .catch(error => console.log('error',error))
           }
 
