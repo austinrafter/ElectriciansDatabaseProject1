@@ -1,10 +1,12 @@
 import './App.css';
 import JobForm from './Components/Job_form';
 import JobsList from './Components/JobsList';
-import WorkPackagesList from './Components/Work_Packages_List'
-import PositionAuthenticationForm from './Components/Authenticate_Salaried_Employees'
+import WorkPackagesList from './Components/Work_Packages_List';
+import PositionAuthenticationForm from './Components/Authenticate_Salaried_Employees';
 import { useState, useEffect } from "react";
-
+import ForemansList from './Components/ForemansList';
+import ProjectManagersList from './Components/ProjectManagersList';
+import GeneralManagersList from './Components/GeneralManagersList';
 
 
 function App() {
@@ -15,11 +17,12 @@ function App() {
 
   const salariedEmployee = (employee) =>{
     const new_salariedEmployee = [...employees,employee]
-    salariedEmployee(new_salariedEmployee)
+    setEmployees(new_salariedEmployee)
   }
 
   const [jobs, setJobs] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [upperManagements, setUpperManagement] = useState([]);
 
  // define variables for the present state of the form and another to change its state
   const [showForm, setShowForm] = useState(false);
@@ -66,6 +69,9 @@ function App() {
           salariedEmployee = {salariedEmployee}
             />
             )}
+        <ForemansList employees = {employees} />
+        <ProjectManagersList employees = {employees} />
+        <GeneralManagersList employees = {employees} />
         <h2>Jobs</h2>
         <JobsList
          jobs={jobs}

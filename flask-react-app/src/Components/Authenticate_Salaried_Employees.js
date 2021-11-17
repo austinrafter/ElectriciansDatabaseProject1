@@ -146,6 +146,9 @@ const PositionAuthenticationForm = (props) => {
                      Check Position</button>
 
                    </form>
+                <div>
+                {}
+                </div>
            </div>
       )}
 

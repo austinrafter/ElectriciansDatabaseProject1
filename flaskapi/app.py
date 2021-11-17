@@ -80,13 +80,13 @@ def check_position():
     #employee = Employees(first_name, last_name, address, city, state, zipcode, position, pay_rate, years_employed,)
     if(position == 'Foreman'):
         foreman = check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position, job_to_view)
-        return jsonify(foreman)
+        return jsonify([e.serialize() for e in foreman])
     elif(position == 'Project Manager'):
         project_manager = check_user_position_project_manager(first_name, last_name, address, city, state, zipcode, position, job_to_view)
-        return jsonify(project_manager)
+        return jsonify([e.serialize() for e in project_manager])
     elif(position == 'General Manager'):
         general_manager = check_user_position_general_manager(first_name, last_name, address, city, state, zipcode, position)
-        return jsonify(general_manager)
+        return jsonify([e.serialize() for e in general_manager])
     else:
          return print("not meant to see this")
 
@@ -114,36 +114,30 @@ def change_material_amount_used_in_work_package(work_package_name, job_site_name
 def get_foreman_view(job_site_name):
     cursor.execute("SELECT * FROM FOREMAN WHERE JOB_SITE_NAME=%s", [job_site_name])
     result = cursor.fetchall()
-    columns = ["Work Package",  "Electrician First Name", "Electrician Last Name", "Individual Hours Given"]
-    format_row = "{:>28}" * (len(result[0]) + 1)
-    print(format_row.format("", *columns))
-    for row in result:
-        print(format_row.format(" ", *row))
-    return jsonify(result)
+    result = cursor.fetchall()
+    foremen = []
+    for x in result:
+        foreman = Foreman(x[0], x[1], x[2], x[3], x[4])
+        foremen.append(foreman)
+    return foremen
 
 def get_project_manager_view(job_site_name):
     cursor.execute("SELECT * FROM PROJECT_MANAGER WHERE SITE_NAME=%s", [job_site_name])
     result = cursor.fetchall()
-    columns = ["Work Package",  "Hours Used", "Material Cost", "Cost of Work Package","Amount Made","Profits", "Site"]
-    format_row = "{:>28}" * (len(result[0]) + 1)
-    print(format_row.format("", *columns))
-    for row in result:
-        print(format_row.format(" ", *row))
     project_managers = []
     for x in result:
-        project_manager = ProjectManager(x[0], x[1], x[2], x[3], x[4], x[5],x[6])
+        project_manager = ProjectManager(x[0], x[1], x[2], x[3], x[4], x[5], x[6])
         project_managers.append(project_manager)
-    return jsonify([e.serialize() for e in project_managers])
+    return project_managers
 
 def get_general_manager_view(job_site_name):
     cursor.execute("SELECT * FROM GENERAL_MANAGER WHERE SITE_NAME=?",[job_site_name])
     result = cursor.fetchall()
-    columns = ["Project Cost",  "Project Price", "Profits", "Days On Project"]
-    format_row = "{:>28}" * (len(result[0]) + 1)
-    print(format_row.format("", *columns))
-    for row in result:
-        print(format_row.format(" ", *row))
-    return jsonify(result)
+    general_managers = []
+    for x in result:
+        general_manager = GeneralManager(x[0], x[1], x[2], x[3])
+        general_managers.append(general_manager)
+    return general_managers
 
 
 

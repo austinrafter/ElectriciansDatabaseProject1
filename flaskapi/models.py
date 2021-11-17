@@ -113,9 +113,10 @@ class ProjectManager():
     total_profits = 0.0
     site_name = ''
 
-    def __init__(self, work_package_name, hours_used, work_package_cost, amount_made, total_profits, site_name):
+    def __init__(self, work_package_name, hours_used, material_cost, work_package_cost, amount_made, total_profits, site_name):
         self.work_package_name = work_package_name
         self.hours_used = hours_used
+        self.material_cost = material_cost
         self.work_package_cost = work_package_cost
         self.amount_made = amount_made
         self.total_profits = total_profits
@@ -125,6 +126,7 @@ class ProjectManager():
         return {
             'work_package_name': self.work_package_name,
             'hours_used': self.hours_used,
+            'material_cost': self.material_cost,
             'work_package_cost': self.work_package_cost,
             'amount_made': self.amount_made,
             'total_profits': self.total_profits,
