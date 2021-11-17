@@ -59,7 +59,6 @@ const JobForm = (props) => {
                      className="btn btn-primary mt-2"
                      >
                      Add job</button>
-
                    </form>
            </div>
       )}

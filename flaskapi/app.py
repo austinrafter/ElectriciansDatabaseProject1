@@ -19,7 +19,7 @@ engine = create_engine('mysql+mysqlconnector://austin:ThisIsMyPassword@localhost
 conn = engine.raw_connection()
 cursor = conn.cursor()
 
-def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,position_name):
+def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,position_name, job_to_view):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
@@ -29,11 +29,11 @@ def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,
     cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID=?", [person[0], position[0]])
     check_position= cursor.fetchone()
     if check_position[0] == position[0]:
-        return True
+        return get_foreman_view(job_to_view)
     else:
         print("you are not a foreman and can't view that")
 
-def check_user_position_project_manager(first_name,last_name,Address,city,state,zipcode,position_name):
+def check_user_position_project_manager(first_name,last_name,Address,city,state,zipcode,position_name, job_to_view):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
@@ -43,7 +43,7 @@ def check_user_position_project_manager(first_name,last_name,Address,city,state,
     cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID= ? ", [person[0], position[0]])
     check_position= cursor.fetchone()
     if check_position[0] == position[0]:
-        return True
+        return get_project_manager_view(job_to_view)
     else:
         print("you are not a project manager and can't view that")
 
@@ -57,33 +57,33 @@ def check_user_position_general_manager(first_name,last_name,Address,city,state,
     cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID=?", [person[0], position[0]])
     check_position= cursor.fetchone()
     if check_position[0] == position[0]:
-        return True
+        return get_general_manager_view()
     else:
         print("you are not a general manager and can't view that")
 
 @app.route("/position_check" , methods=["GET"], strict_slashes=False)
 @cross_origin()
 def check_position():
-    first_name = request.form['first_name']
-    last_name = request.form['last_name']
-    position = request.form['position']
-    address = request.form['address']
-    city = request.form['city']
-    state = request.form['state']
-    zipcode = request.form['zipcode']
-    years_employed = request.form['years_employed']
-    pay_rate = request.form['pay_rate']
-    session['employee_position'] = position
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+    years_employed = request.json['years_employed']
+    pay_rate = request.json['pay_rate']
+    print(position)
     employee = Employees(first_name, last_name, address, city, state, zipcode, position, pay_rate, years_employed)
     if(position == 'Foreman'):
-        check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position)
-        return jsonify(employee)
+        foreman = check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position)
+        return jsonify(foreman)
     elif(position == 'Project Manager'):
-        check_user_position_project_manager(first_name, last_name, address, city, state, zipcode, position)
-        return jsonify(employee)
+        project_manager = check_user_position_project_manager(first_name, last_name, address, city, state, zipcode, position)
+        return jsonify(project_manager)
     elif(position == 'General Manager'):
-        check_user_position_general_manager(first_name, last_name, address, city, state, zipcode, position)
-        return jsonify(employee)
+        general_manager = check_user_position_general_manager(first_name, last_name, address, city, state, zipcode, position)
+        return jsonify(general_manager)
     else:
          return jsonify(employee)
 
@@ -118,8 +118,8 @@ def get_foreman_view(job_site_name):
         print(format_row.format(" ", *row))
     return jsonify(result)
 
-def get_project_manager_view():
-    cursor.execute("SELECT * FROM PROJECT_MANAGER")
+def get_project_manager_view(job_site_name):
+    cursor.execute("SELECT * FROM PROJECT_MANAGER WHERE SITE_NAME=?", [job_site_name])
     result = cursor.fetchall()
     columns = ["Work Package",  "Hours Used", "Material Cost", "Cost of Work Package","Amount Made","Profits", "Site"]
     format_row = "{:>28}" * (len(result[0]) + 1)
@@ -128,8 +128,8 @@ def get_project_manager_view():
         print(format_row.format(" ", *row))
     return jsonify(result)
 
-def get_general_manager_view():
-    cursor.execute("SELECT * FROM GENERAL_MANAGER")
+def get_general_manager_view(job_site_name):
+    cursor.execute("SELECT * FROM GENERAL_MANAGER WHERE SITE_NAME=?",[job_site_name])
     result = cursor.fetchall()
     columns = ["Project Cost",  "Project Price", "Profits", "Days On Project"]
     format_row = "{:>28}" * (len(result[0]) + 1)
@@ -352,7 +352,7 @@ def jobs():
         location_names.append(name[0])
     job_info = []
     for x in range(len(jobs_name)):
-        job_info.append([jobs_id[x],str(start_dates[x]),jobs_name[x],location_names[x]])
+        job_info.append([jobs_id[x],datetime.strptime(('%s' % start_dates[x]), '%Y-%m-%d'),jobs_name[x],location_names[x]])
     jobs = []
     for x in job_info:
         job = Jobs(x[0],x[1],x[2],x[3])

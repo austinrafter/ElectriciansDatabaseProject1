@@ -34,10 +34,6 @@ function App() {
     setShowFormTwo(!showFormTwo);
   }
 
-
-
-
-
     useEffect(()=>{
       fetch('http://localhost:5000/jobs',{
         'methods':'GET',

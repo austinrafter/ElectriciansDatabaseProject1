@@ -12,9 +12,10 @@ const PositionAuthenticationForm = (props) => {
     const [position, setPosition] = useState('')
     const [pay_rate, setPayRate] = useState('')
     const [years_employed, setYearsEmployed] = useState('')
+    const [job_to_view, setJobToView] = useState('')
 
     const checkPosition = () =>{
-    APIServiceFour.CheckPosition({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed})
+    APIServiceFour.CheckPosition({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
     .then((response) => props.salariedEmployee(response))
           .catch(error => console.log('error',error))
           }
@@ -31,10 +32,12 @@ const PositionAuthenticationForm = (props) => {
           setPosition('')
           setPayRate('')
           setYearsEmployed('')
+          setJobToView('')
         }
 
       return (
            <div>
+           <h2> Enter your information to see the right info about jobs </h2>
              <form onSubmit = {handleSubmit} >
 
                      <label htmlFor="first_name" className="form-label">First Name</label>
@@ -124,6 +127,16 @@ const PositionAuthenticationForm = (props) => {
                      placeholder ="Enter years employed"
                      value={years_employed}
                      onChange={(e)=>setYearsEmployed(e.target.value)}
+                     required
+                     />
+
+                     <label htmlFor="job_to_view" className="form-label">Years Employed</label>
+                     <input
+                     type="text"
+                     className="form-control"
+                     placeholder ="Enter job_to_view"
+                     value={job_to_view}
+                     onChange={(e)=>setJobToView(e.target.value)}
                      required
                      />
 
