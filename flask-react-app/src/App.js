@@ -9,7 +9,12 @@ import ProjectManagersList from './Components/ProjectManagersList';
 import GeneralManagersList from './Components/GeneralManagersList';
 import PositionAuthenticationFormTwo from './Components/AuthenticateSalariedEmployeesTwo';
 import PositionAuthenticationFormThree from './Components/AuthenticateSalariedEmployeesThree';
-
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import Foreman from "./Pages/Foreman";
+import Project_Manager from "./Pages/Project_Manager";
+import General_Manager from "./Pages/General_Manager";
+import Jobs from "./Pages/Jobs";
+import Home from "./Pages/Home";
 
 function App() {
  const insertedJob = (job) =>{
@@ -78,51 +83,40 @@ function App() {
       <div className="App container m-4">
       <div className="row">
       <div className="text-center">
-      <h1>Welcome to SJ Electric Company.</h1>
+      <Router>
+      <div>
+        <Link to="/">Home</Link>
+      </div>
+      <div>
+        <Link to="/jobs">Jobs</Link>
+      </div>
+      <div>
+        <Link to="/general_manager">General Managers</Link>
+      </div>
+      <div>
+        <Link to="/project_manager">Project Managers</Link>
+      </div>
+      <div>
+        <Link to="/foreman">Foremen</Link>
+      </div>
+
+      <hr />
+
+      <Routes>
+      <Route path="/" element={<Home />}>
+        </Route>
+        <Route path="/jobs" element={<Jobs />}>
+        </Route>
+        <Route path="/general_manager" element={<General_Manager />}>
+        </Route>
+        <Route path="/project_manager" element={<Project_Manager />}>
+        </Route>
+        <Route path="/foreman" element={<Foreman />}>
+        </Route>
+      </Routes>
+    </Router>
         </div>
         </div>
-        <button
-          onClick={toggleShowForm}
-          className="btn btn-primary"
-           >
-             Are you a foreman? See information about jobs here.
-        <i className="bi bi-pencil-square m-2"></i>
-        </button>
-        {showForm && (
-          <PositionAuthenticationForm
-          findForeman = {findForeman}
-            />
-            )}
-            <hr/>
-              <button
-          onClick={toggleShowFormThree}
-          className="btn btn-primary"
-           >
-             Are you a project manager? See information about jobs here.
-        <i className="bi bi-pencil-square m-2"></i>
-        </button>
-        {showFormThree && (
-          <PositionAuthenticationFormTwo
-          findProjectManager = {findProjectManager}
-            />
-            )}
-            <hr/>
-              <button
-          onClick={toggleShowFormFour}
-          className="btn btn-primary"
-           >
-             Are you a general manager? See information about jobs here.
-        <i className="bi bi-pencil-square m-2"></i>
-        </button>
-        {showFormFour && (
-          <PositionAuthenticationFormThree
-          findGeneralManager = {findGeneralManager}
-            />
-            )}
-        <h2>Jobs</h2>
-        <JobsList
-         jobs={jobs}
-         />
           <button
           onClick={toggleShowFormTwo}
           className="btn btn-primary"

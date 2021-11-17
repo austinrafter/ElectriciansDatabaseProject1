@@ -4,6 +4,11 @@ import GeneralManagersList from '../Components/GeneralManagersList';
 
 
 const PositionAuthenticationFormThree = (props) => {
+    const insertedJob = (job) =>{
+        const new_jobs = [...jobs,job]
+        setJobs(new_jobs)
+    }
+
     const [first_name, setFirstName] = useState('')
     const [last_name, setLastName] = useState('')
     const [address, setAddress] = useState('')
@@ -15,6 +20,7 @@ const PositionAuthenticationFormThree = (props) => {
     const [years_employed, setYearsEmployed] = useState('')
     const [job_to_view, setJobToView] = useState('')
     const [general_managers, setGeneralManagers] = useState([]);
+    const [jobs, setJobs] = useState([]);
 
     const checkPositionThree = () =>{
     APIServiceSeven.CheckPositionThree({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
@@ -35,6 +41,12 @@ const PositionAuthenticationFormThree = (props) => {
           setPayRate('')
           setYearsEmployed('')
           setJobToView('')
+        }
+
+        const [showFormTwo, setShowFormTwo] = useState(false);
+
+        const toggleShowFormTwo = () => {
+        setShowFormTwo(!showFormTwo);
         }
 
       return (
@@ -150,6 +162,8 @@ const PositionAuthenticationFormThree = (props) => {
                    </form>
                 <div>
                 <GeneralManagersList general_managers = {general_managers} />
+                </div>
+                <div>
                 </div>
            </div>
       )}
