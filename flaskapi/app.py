@@ -116,8 +116,9 @@ def get_foreman_view(job_site_name):
     result = cursor.fetchall()
     result = cursor.fetchall()
     foremen = []
+    i=0
     for x in result:
-        foreman = Foreman(x[0], x[1], x[2], x[3], x[4])
+        foreman = Foreman(i+1, x[0], x[1], x[2], x[3], x[4])
         foremen.append(foreman)
     return foremen
 
@@ -125,8 +126,9 @@ def get_project_manager_view(job_site_name):
     cursor.execute("SELECT * FROM PROJECT_MANAGER WHERE SITE_NAME=%s", [job_site_name])
     result = cursor.fetchall()
     project_managers = []
+    i = 0
     for x in result:
-        project_manager = ProjectManager(x[0], x[1], x[2], x[3], x[4], x[5], x[6])
+        project_manager = ProjectManager(i+1, x[0], x[1], x[2], x[3], x[4], x[5], x[6])
         project_managers.append(project_manager)
     return project_managers
 
@@ -134,8 +136,9 @@ def get_general_manager_view(job_site_name):
     cursor.execute("SELECT * FROM GENERAL_MANAGER WHERE SITE_NAME=?",[job_site_name])
     result = cursor.fetchall()
     general_managers = []
+    i = 0
     for x in result:
-        general_manager = GeneralManager(x[0], x[1], x[2], x[3])
+        general_manager = GeneralManager(i+1, x[0], x[1], x[2], x[3])
         general_managers.append(general_manager)
     return general_managers
 

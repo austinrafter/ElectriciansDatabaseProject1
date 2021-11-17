@@ -82,13 +82,15 @@ class WorkPackages():
         }
 
 class Foreman():
+    foreman_id = 0
     site_name = ''
     work_package_name = ''
     worker_first_name = ''
     worker_last_name = ''
     individual_hours_alloted = 0
 
-    def __init__(self, site_name,work_package_name, worker_first_name, worker_last_name, individual_hours_alloted):
+    def __init__(self, foreman_id, site_name,work_package_name, worker_first_name, worker_last_name, individual_hours_alloted):
+        self.foreman_id = foreman_id
         self.site_name = site_name
         self.work_package_name = work_package_name
         self.worker_first_name = worker_first_name
@@ -97,6 +99,7 @@ class Foreman():
 
     def serialize(self):
         return {
+            'foreman_id' : self.foreman_id,
             'site_name': self.site_name,
             'work_package_name': self.work_package_name,
             'worker_first_name': self.worker_first_name,
@@ -105,6 +108,7 @@ class Foreman():
         }
 
 class ProjectManager():
+    project_manager_id = 0
     work_package_name = ''
     hours_used = ''
     material_cost = 0.0
@@ -113,7 +117,8 @@ class ProjectManager():
     total_profits = 0.0
     site_name = ''
 
-    def __init__(self, work_package_name, hours_used, material_cost, work_package_cost, amount_made, total_profits, site_name):
+    def __init__(self, project_manager_id, work_package_name, hours_used, material_cost, work_package_cost, amount_made, total_profits, site_name):
+        self.project_manager_id = project_manager_id
         self.work_package_name = work_package_name
         self.hours_used = hours_used
         self.material_cost = material_cost
@@ -124,6 +129,7 @@ class ProjectManager():
 
     def serialize(self):
         return {
+            'project_manager_id' : self.project_manager_id,
             'work_package_name': self.work_package_name,
             'hours_used': self.hours_used,
             'material_cost': self.material_cost,
@@ -134,19 +140,22 @@ class ProjectManager():
         }
 
 class GeneralManager():
+    general_manager_id = 0
     cost_of_project = 0.0
     amount_made = 0.0
     total_profits = 0.0
     number_of_days_on_project = 0.0
 
-    def __init__(self, cost_of_project, amount_made, total_profits, number_of_days_on_project):
+    def __init__(self, general_manager_id, cost_of_project, amount_made, total_profits, number_of_days_on_project):
         self.cost_of_project = cost_of_project
+        self.general_manager_id = general_manager_id
         self.amount_made = amount_made
         self.total_profits = total_profits
         self.number_of_days_on_project = number_of_days_on_project
 
     def serialize(self):
         return {
+            'general_manager_id' : self.general_manager_id,
             'cost_of_project': self.cost_of_project,
             'amount_made': self.amount_made,
             'total_profits': self.total_profits,

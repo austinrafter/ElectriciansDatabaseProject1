@@ -8,7 +8,7 @@ const GeneralManagersList = (props) => {
         {props.general_managers && props.general_managers.map(general_manager =>{
         return (
 
-        <div >
+        <div key = {general_manager.general_manager_id}>
         <h2>General Managers View </h2>
         <h2 variant="text-primary" size="lg">
         { general_manager.cost_of_project}
