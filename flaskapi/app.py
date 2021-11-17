@@ -3,7 +3,7 @@ from flask import Flask, jsonify, session
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
-from models import Jobs, WorkPackages, Employees
+from models import Jobs, WorkPackages, Employees, Foreman, ProjectManager, GeneralManager
 from datetime import datetime
 
 
@@ -20,13 +20,13 @@ conn = engine.raw_connection()
 cursor = conn.cursor()
 
 def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,position_name, job_to_view):
-    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
-    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
-    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
-    cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID=?", [person[0], position[0]])
+    cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = %s AND POSITION_ID=%s", [person[0], position[0]])
     check_position= cursor.fetchone()
     if check_position[0] == position[0]:
         return get_foreman_view(job_to_view)
@@ -34,13 +34,13 @@ def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,
         print("you are not a foreman and can't view that")
 
 def check_user_position_project_manager(first_name,last_name,Address,city,state,zipcode,position_name, job_to_view):
-    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
-    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
-    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
-    cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID= ? ", [person[0], position[0]])
+    cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = %s AND POSITION_ID= %s", [person[0], position[0]])
     check_position= cursor.fetchone()
     if check_position[0] == position[0]:
         return get_project_manager_view(job_to_view)
@@ -48,44 +48,47 @@ def check_user_position_project_manager(first_name,last_name,Address,city,state,
         print("you are not a project manager and can't view that")
 
 def check_user_position_general_manager(first_name,last_name,Address,city,state,zipcode,position_name):
-    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
-    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
-    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
-    cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID=?", [person[0], position[0]])
-    check_position= cursor.fetchone()
+    cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = %s AND POSITION_ID=%s", [person[0], position[0]])
+    check_position = cursor.fetchone()
     if check_position[0] == position[0]:
         return get_general_manager_view()
     else:
         print("you are not a general manager and can't view that")
 
-@app.route("/position_check" , methods=["GET"], strict_slashes=False)
+@app.route("/position_check" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def check_position():
     first_name = request.json['first_name']
+    print(first_name)
     last_name = request.json['last_name']
     position = request.json['position']
     address = request.json['address']
     city = request.json['city']
     state = request.json['state']
-    zipcode = request.json['zipcode']
+    zipcode = request.json['zip']
     years_employed = request.json['years_employed']
+    print(years_employed)
     pay_rate = request.json['pay_rate']
+    job_to_view = request.json['job_to_view']
     print(position)
-    employee = Employees(first_name, last_name, address, city, state, zipcode, position, pay_rate, years_employed)
+    #employee = Employees(first_name, last_name, address, city, state, zipcode, position, pay_rate, years_employed,)
     if(position == 'Foreman'):
-        foreman = check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position)
+        foreman = check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position, job_to_view)
         return jsonify(foreman)
     elif(position == 'Project Manager'):
-        project_manager = check_user_position_project_manager(first_name, last_name, address, city, state, zipcode, position)
+        project_manager = check_user_position_project_manager(first_name, last_name, address, city, state, zipcode, position, job_to_view)
         return jsonify(project_manager)
     elif(position == 'General Manager'):
         general_manager = check_user_position_general_manager(first_name, last_name, address, city, state, zipcode, position)
         return jsonify(general_manager)
     else:
-         return jsonify(employee)
+         return print("not meant to see this")
 
 @app.route("/hours_used" , methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -99,7 +102,7 @@ def change_hours_used_on_work_package():
     conn.commit()
 
 def change_material_amount_used_in_work_package(work_package_name, job_site_name, inventory_name, amount_used):
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [job_site_name])
+    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [job_site_name])
     job_site = cursor.fetchone()
     cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [work_package_name,job_site])
     work_package = cursor.fetchone()
@@ -109,7 +112,7 @@ def change_material_amount_used_in_work_package(work_package_name, job_site_name
     conn.commit()
 
 def get_foreman_view(job_site_name):
-    cursor.execute("SELECT * FROM FOREMAN WHERE JOB_SITE_NAME=?", [job_site_name])
+    cursor.execute("SELECT * FROM FOREMAN WHERE JOB_SITE_NAME=%s", [job_site_name])
     result = cursor.fetchall()
     columns = ["Work Package",  "Electrician First Name", "Electrician Last Name", "Individual Hours Given"]
     format_row = "{:>28}" * (len(result[0]) + 1)
@@ -119,14 +122,18 @@ def get_foreman_view(job_site_name):
     return jsonify(result)
 
 def get_project_manager_view(job_site_name):
-    cursor.execute("SELECT * FROM PROJECT_MANAGER WHERE SITE_NAME=?", [job_site_name])
+    cursor.execute("SELECT * FROM PROJECT_MANAGER WHERE SITE_NAME=%s", [job_site_name])
     result = cursor.fetchall()
     columns = ["Work Package",  "Hours Used", "Material Cost", "Cost of Work Package","Amount Made","Profits", "Site"]
     format_row = "{:>28}" * (len(result[0]) + 1)
     print(format_row.format("", *columns))
     for row in result:
         print(format_row.format(" ", *row))
-    return jsonify(result)
+    project_managers = []
+    for x in result:
+        project_manager = ProjectManager(x[0], x[1], x[2], x[3], x[4], x[5],x[6])
+        project_managers.append(project_manager)
+    return jsonify([e.serialize() for e in project_managers])
 
 def get_general_manager_view(job_site_name):
     cursor.execute("SELECT * FROM GENERAL_MANAGER WHERE SITE_NAME=?",[job_site_name])
@@ -342,7 +349,6 @@ def jobs():
     jobs_name = cursor.fetchall()
     cursor.execute("SELECT LOCATION_ID FROM JOB_SITE")
     location_id = cursor.fetchall()
-    print(location_id)
     cursor.execute("SELECT START_DATE FROM JOB_SITE")
     start_dates = cursor.fetchall()
     location_names = []

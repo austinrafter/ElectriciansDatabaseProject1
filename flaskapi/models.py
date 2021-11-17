@@ -121,6 +121,16 @@ class ProjectManager():
         self.total_profits = total_profits
         self.site_name = site_name
 
+    def serialize(self):
+        return {
+            'work_package_name': self.work_package_name,
+            'hours_used': self.hours_used,
+            'work_package_cost': self.work_package_cost,
+            'amount_made': self.amount_made,
+            'total_profits': self.total_profits,
+            'site_name': self.site_name,
+        }
+
 class GeneralManager():
     cost_of_project = 0.0
     amount_made = 0.0
@@ -132,6 +142,14 @@ class GeneralManager():
         self.amount_made = amount_made
         self.total_profits = total_profits
         self.number_of_days_on_project = number_of_days_on_project
+
+    def serialize(self):
+        return {
+            'cost_of_project': self.cost_of_project,
+            'amount_made': self.amount_made,
+            'total_profits': self.total_profits,
+            'number_of_days_on_project': self.number_of_days_on_project,
+        }
 
 
 
