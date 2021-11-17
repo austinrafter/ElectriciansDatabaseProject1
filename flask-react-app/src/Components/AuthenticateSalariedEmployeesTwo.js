@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import APIServiceSix from '../Components/APIServiceSix.js'
+import ProjectManagersList from '../Components/ProjectManagersList';
 
 
 const PositionAuthenticationFormTwo = (props) => {
@@ -13,10 +14,11 @@ const PositionAuthenticationFormTwo = (props) => {
     const [pay_rate, setPayRate] = useState('')
     const [years_employed, setYearsEmployed] = useState('')
     const [job_to_view, setJobToView] = useState('')
+    const [project_managers, setProjectManagers] = useState([]);
 
     const checkPositionTwo = () =>{
     APIServiceSix.CheckPositionTwo({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
-    .then((response) => props.findProjectManager(response))
+    .then((response) => setProjectManagers(response))
           .catch(error => console.log('error',error))
           }
 
@@ -147,7 +149,7 @@ const PositionAuthenticationFormTwo = (props) => {
 
                    </form>
                 <div>
-                {}
+                <ProjectManagersList project_managers = {project_managers} />
                 </div>
            </div>
       )}

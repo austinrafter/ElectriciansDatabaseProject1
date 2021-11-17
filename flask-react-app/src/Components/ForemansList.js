@@ -11,7 +11,7 @@ const ForemansList = (props) => {
         <div key = {foreman.foreman_id}>
         <h2> Foreman View </h2>
         <h2 className="text-primary">
-        { foreman.work_package_name_foreman}
+        { foreman.package_name_foreman}
          </h2>
          <h3> Job name </h3>
          <p> { foreman.site_name_foreman } </p>

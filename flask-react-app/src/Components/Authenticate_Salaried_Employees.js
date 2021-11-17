@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import APIServiceFour from '../Components/ApiServiceFour.js'
+import ForemansList from '../Components/ForemansList'
 
 
 const PositionAuthenticationForm = (props) => {
@@ -13,10 +14,11 @@ const PositionAuthenticationForm = (props) => {
     const [pay_rate, setPayRate] = useState('')
     const [years_employed, setYearsEmployed] = useState('')
     const [job_to_view, setJobToView] = useState('')
+    const [foremen, setForemen] = useState([]);
 
     const checkPosition = () =>{
     APIServiceFour.CheckPosition({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
-    .then((response) => props.findForeman(response))
+    .then((response) => setForemen(response))
           .catch(error => console.log('error',error))
           }
 
@@ -147,7 +149,7 @@ const PositionAuthenticationForm = (props) => {
 
                    </form>
                 <div>
-                {}
+                <ForemansList foremen = {foremen} />
                 </div>
            </div>
       )}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import APIServiceSeven from '../Components/APIServiceSeven.js'
+import GeneralManagersList from '../Components/GeneralManagersList';
 
 
 const PositionAuthenticationFormThree = (props) => {
@@ -13,10 +14,11 @@ const PositionAuthenticationFormThree = (props) => {
     const [pay_rate, setPayRate] = useState('')
     const [years_employed, setYearsEmployed] = useState('')
     const [job_to_view, setJobToView] = useState('')
+    const [general_managers, setGeneralManagers] = useState([]);
 
     const checkPositionThree = () =>{
     APIServiceSeven.CheckPositionThree({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
-    .then((response) => props.findGeneralManager(response))
+    .then((response) => setGeneralManagers(response))
           .catch(error => console.log('error',error))
           }
 
@@ -147,7 +149,7 @@ const PositionAuthenticationFormThree = (props) => {
 
                    </form>
                 <div>
-                {}
+                <GeneralManagersList general_managers = {general_managers} />
                 </div>
            </div>
       )}

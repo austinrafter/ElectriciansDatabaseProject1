@@ -93,7 +93,6 @@ function App() {
           findForeman = {findForeman}
             />
             )}
-            <ForemansList foremen = {foremen} />
             <hr/>
               <button
           onClick={toggleShowFormThree}
@@ -107,7 +106,6 @@ function App() {
           findProjectManager = {findProjectManager}
             />
             )}
-            <ProjectManagersList project_managers = {project_managers} />
             <hr/>
               <button
           onClick={toggleShowFormFour}
@@ -121,7 +119,6 @@ function App() {
           findGeneralManager = {findGeneralManager}
             />
             )}
-        <GeneralManagersList general_managers = {general_managers} />
         <h2>Jobs</h2>
         <JobsList
          jobs={jobs}

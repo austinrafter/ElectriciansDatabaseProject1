@@ -84,15 +84,15 @@ class WorkPackages():
 class Foreman():
     foreman_id = 0
     site_name_foreman = ''
-    work_package_name_foreman = ''
+    package_name_foreman = ''
     worker_first_name = ''
     worker_last_name = ''
     individual_hours_alloted = 0
 
-    def __init__(self, foreman_id, site_name_foreman,work_package_name_foreman, worker_first_name, worker_last_name, individual_hours_alloted):
+    def __init__(self, foreman_id, site_name_foreman,package_name_foreman, worker_first_name, worker_last_name, individual_hours_alloted):
         self.foreman_id = foreman_id
         self.site_name_foreman = site_name_foreman
-        self.work_package_name_foreman = work_package_name_foreman
+        self.package_name_foreman = package_name_foreman
         self.worker_first_name = worker_first_name
         self.worker_last_name = worker_last_name
         self.individual_hours_alloted = individual_hours_alloted
@@ -101,7 +101,7 @@ class Foreman():
         return {
             'foreman_id' : self.foreman_id,
             'site_name_foreman': self.site_name_foreman,
-            'work_package_name_foreman': self.work_package_name_foreman,
+            'package_name_foreman': self.package_name_foreman,
             'worker_first_name': self.worker_first_name,
             'worker_last_name': self.worker_last_name,
             'individual_hours_alloted': self.individual_hours_alloted,
