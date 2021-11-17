@@ -61,9 +61,29 @@ def check_user_position_general_manager(first_name,last_name,Address,city,state,
     else:
         print("you are not a general manager and can't view that")
 
-@app.route("/position_check" , methods=["POST"], strict_slashes=False)
+@app.route("/foreman" , methods=["POST"], strict_slashes=False)
 @cross_origin()
-def check_position():
+def foreman():
+    first_name = request.json['first_name']
+    print(first_name)
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zip']
+    years_employed = request.json['years_employed']
+    print(years_employed)
+    pay_rate = request.json['pay_rate']
+    job_to_view = request.json['job_to_view']
+    print(position)
+    foreman = check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position, job_to_view)
+    print(foreman)
+    return jsonify([e.serialize() for e in foreman])
+
+@app.route("/project_manager" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def project_manager():
     first_name = request.json['first_name']
     print(first_name)
     last_name = request.json['last_name']
@@ -78,18 +98,33 @@ def check_position():
     job_to_view = request.json['job_to_view']
     print(position)
     #employee = Employees(first_name, last_name, address, city, state, zipcode, position, pay_rate, years_employed,)
-    if(position == 'Foreman'):
-        foreman = check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position, job_to_view)
-        return jsonify([e.serialize() for e in foreman])
-    if(position == 'Project Manager'):
-        project_manager = check_user_position_project_manager(first_name, last_name, address, city, state, zipcode, position, job_to_view)
-        print(project_manager)
-        return jsonify([e.serialize() for e in project_manager])
-    if(position == 'General Manager'):
-        general_manager = check_user_position_general_manager(first_name, last_name, address, city, state, zipcode, position)
-        return jsonify([e.serialize() for e in general_manager])
-    else:
-         return print("not meant to see this")
+
+    project_manager = check_user_position_project_manager(first_name, last_name, address, city, state, zipcode, position, job_to_view)
+    print(project_manager)
+    return jsonify([e.serialize() for e in project_manager])
+
+
+@app.route("/general_manager" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def general_manager():
+    first_name = request.json['first_name']
+    print(first_name)
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zip']
+    years_employed = request.json['years_employed']
+    print(years_employed)
+    pay_rate = request.json['pay_rate']
+    job_to_view = request.json['job_to_view']
+    print(position)
+
+    general_manager = check_user_position_general_manager(first_name, last_name, address, city, state, zipcode, position)
+    return jsonify([e.serialize() for e in general_manager])
+
+
 
 @app.route("/hours_used" , methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -113,9 +148,9 @@ def change_material_amount_used_in_work_package(work_package_name, job_site_name
     conn.commit()
 
 def get_foreman_view(job_site_name):
-    cursor.execute("SELECT * FROM FOREMAN WHERE JOB_SITE_NAME=%s", [job_site_name])
+    cursor.execute("SELECT * FROM FOREMAN WHERE SITE_NAME=%s", [job_site_name])
     result = cursor.fetchall()
-    result = cursor.fetchall()
+    print(result)
     foremen = []
     i=0
     for x in result:

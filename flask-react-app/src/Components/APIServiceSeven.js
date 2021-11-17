@@ -1,6 +1,6 @@
 export default class APIServiceSeven{
-    static CheckPosition(body){
-    return fetch('http://localhost:5000/position_check',{
+    static CheckPositionThree(body){
+    return fetch('http://localhost:5000/general_manager',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

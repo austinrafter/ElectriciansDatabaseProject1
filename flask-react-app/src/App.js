@@ -18,8 +18,8 @@ function App() {
   }
 
   const findForeman = (foreman) =>{
-    const new_salariedEmployee = [...foremans,foreman]
-    setForemans(new_salariedEmployee)
+    const new_salariedEmployee = [...foremen,foreman]
+    setForemen(new_salariedEmployee)
   }
 
    const findProjectManager = (project_manager) =>{
@@ -33,7 +33,7 @@ function App() {
   }
 
   const [jobs, setJobs] = useState([]);
-  const [foremans, setForemans] = useState([]);
+  const [foremen, setForemen] = useState([]);
   const [project_managers, setProjectManagers] = useState([]);
   const [general_managers, setGeneralManagers] = useState([]);
 
@@ -93,7 +93,7 @@ function App() {
           findForeman = {findForeman}
             />
             )}
-            <ForemansList foremans = {foremans} />
+            <ForemansList foremen = {foremen} />
             <hr/>
               <button
           onClick={toggleShowFormThree}
