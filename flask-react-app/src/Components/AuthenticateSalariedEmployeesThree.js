@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import APIServiceFour from '../Components/ApiServiceFour.js'
+import APIServiceSeven from '../Components/APIServiceSeven.js'
 
 
 const PositionAuthenticationFormThree = (props) => {
@@ -15,7 +15,7 @@ const PositionAuthenticationFormThree = (props) => {
     const [job_to_view, setJobToView] = useState('')
 
     const checkPositionThree = () =>{
-    APIServiceFour.CheckPosition({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
+    APIServiceSeven.CheckPositionThree({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
     .then((response) => props.findGeneralManager(response))
           .catch(error => console.log('error',error))
           }

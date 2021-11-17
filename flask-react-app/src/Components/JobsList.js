@@ -49,8 +49,8 @@ const checkPosition = () =>{
         <hr/>
         <div>
         <WorkPackagesList work_packages={work_packages}/>
-
         </div>
+
         </div>
     )
 

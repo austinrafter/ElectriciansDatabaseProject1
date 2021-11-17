@@ -12,18 +12,12 @@ import PositionAuthenticationFormThree from './Components/AuthenticateSalariedEm
 
 
 function App() {
-
-  const [jobs, setJobs] = useState([]);
-  const [foremans, setForemans] = useState([]);
-  const [project_managers, setProjectManagers] = useState([]);
-  const [general_managers, setGeneralManagers] = useState([]);
-
-  const insertedJob = (job) =>{
+ const insertedJob = (job) =>{
     const new_jobs = [...jobs,job]
     setJobs(new_jobs)
   }
 
-    const findForeman = (foreman) =>{
+  const findForeman = (foreman) =>{
     const new_salariedEmployee = [...foremans,foreman]
     setForemans(new_salariedEmployee)
   }
@@ -37,6 +31,11 @@ function App() {
     const new_generalManager = [...general_managers,general_manager]
     setGeneralManagers(new_generalManager)
   }
+
+  const [jobs, setJobs] = useState([]);
+  const [foremans, setForemans] = useState([]);
+  const [project_managers, setProjectManagers] = useState([]);
+  const [general_managers, setGeneralManagers] = useState([]);
 
 
  // define variables for the present state of the form and another to change its state

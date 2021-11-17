@@ -81,10 +81,11 @@ def check_position():
     if(position == 'Foreman'):
         foreman = check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position, job_to_view)
         return jsonify([e.serialize() for e in foreman])
-    elif(position == 'Project Manager'):
+    if(position == 'Project Manager'):
         project_manager = check_user_position_project_manager(first_name, last_name, address, city, state, zipcode, position, job_to_view)
+        print(project_manager)
         return jsonify([e.serialize() for e in project_manager])
-    elif(position == 'General Manager'):
+    if(position == 'General Manager'):
         general_manager = check_user_position_general_manager(first_name, last_name, address, city, state, zipcode, position)
         return jsonify([e.serialize() for e in general_manager])
     else:
@@ -130,7 +131,6 @@ def get_project_manager_view(job_site_name):
     for x in result:
         project_manager = ProjectManager(i+1, x[0], x[1], x[2], x[3], x[4], x[5], x[6])
         project_managers.append(project_manager)
-    print(project_managers)
     return project_managers
 
 def get_general_manager_view(job_site_name):

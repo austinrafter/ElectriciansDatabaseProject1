@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import APIServiceFour from '../Components/ApiServiceFour.js'
+import APIServiceSix from '../Components/APIServiceSix.js'
 
 
 const PositionAuthenticationFormTwo = (props) => {
@@ -15,7 +15,7 @@ const PositionAuthenticationFormTwo = (props) => {
     const [job_to_view, setJobToView] = useState('')
 
     const checkPositionTwo = () =>{
-    APIServiceFour.CheckPosition({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
+    APIServiceSix.CheckPositionTwo({first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
     .then((response) => props.findProjectManager(response))
           .catch(error => console.log('error',error))
           }
