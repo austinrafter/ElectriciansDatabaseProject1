@@ -117,18 +117,6 @@ function App() {
     </Router>
         </div>
         </div>
-          <button
-          onClick={toggleShowFormTwo}
-          className="btn btn-primary"
-           >
-             Add a job
-        <i className="bi bi-pencil-square m-2"></i>
-        </button>
-         {showFormTwo && (
-          <JobForm
-          insertedJob = {insertedJob}
-            />
-            )}
 
          </div>
 

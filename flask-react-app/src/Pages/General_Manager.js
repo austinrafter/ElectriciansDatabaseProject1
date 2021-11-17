@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import PositionAuthenticationFormThree from '../Components/AuthenticateSalariedEmployeesThree';
+import JobForm from '../Components/Job_form';
 
 const General_Manager = () => {
+
+const insertedJob = (job) =>{
+    const new_jobs = [...jobs,job]
+    setJobs(new_jobs)
+  }
 
   const findGeneralManager = (general_manager) =>{
     const new_generalManager = [...general_managers,general_manager]
@@ -9,8 +15,13 @@ const General_Manager = () => {
   }
 
   const [general_managers, setGeneralManagers] = useState([]);
-
+  const [jobs, setJobs] = useState([]);
+  const [showFormTwo, setShowFormTwo] = useState(false);
   const [showFormFour, setShowFormFour] = useState(false);
+
+  const toggleShowFormTwo = () => {
+    setShowFormTwo(!showFormTwo);
+  }
 
   const toggleShowFormFour = () => {
     setShowFormFour(!showFormFour);
@@ -31,6 +42,20 @@ const General_Manager = () => {
           findGeneralManager = {findGeneralManager}
             />
             )}
+    <div>
+    <button
+          onClick={toggleShowFormTwo}
+          className="btn btn-primary"
+           >
+             Add a job
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+         {showFormTwo && (
+          <JobForm
+          insertedJob = {insertedJob}
+            />
+            )}
+            </div>
   </div>
   )
 
