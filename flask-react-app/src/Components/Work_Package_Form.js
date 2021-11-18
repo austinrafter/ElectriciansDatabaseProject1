@@ -98,7 +98,7 @@ const Work_Package_Form = (props) => {
                      required
                      />
 
-                     <label htmlFor="first_name" className="form-label">GM First Name</label>
+                     <label htmlFor="first_name" className="form-label">PM or Foreman First Name</label>
                       <input
                       type="text"
                       className="form-control"
@@ -108,7 +108,7 @@ const Work_Package_Form = (props) => {
                       required
                       />
 
-                      <label htmlFor="last_name" className="form-label">GM Last Name</label>
+                      <label htmlFor="last_name" className="form-label">PM or Foreman Last Name</label>
                       <input
                       type="text"
                       className="form-control"
@@ -118,7 +118,7 @@ const Work_Package_Form = (props) => {
                       required
                       />
 
-                      <label htmlFor="address" className="form-label">Address</label>
+                      <label htmlFor="address" className="form-label">PM or Foreman Address</label>
                       <input
                       type="text"
                       className="form-control"
@@ -128,7 +128,7 @@ const Work_Package_Form = (props) => {
                       required
                       />
 
-                       <label htmlFor="city" className="form-label">City</label>
+                       <label htmlFor="city" className="form-label">PM or Foreman City</label>
                      <input
                      type="text"
                      className="form-control"
@@ -138,7 +138,7 @@ const Work_Package_Form = (props) => {
                      required
                      />
 
-                      <label htmlFor="state" className="form-label">State</label>
+                      <label htmlFor="state" className="form-label">PM or Foreman State</label>
                      <input
                      type="text"
                      className="form-control"
@@ -148,7 +148,7 @@ const Work_Package_Form = (props) => {
                      required
                      />
 
-                      <label htmlFor="zipcode" className="form-label">Zipcode</label>
+                      <label htmlFor="zipcode" className="form-label">PM or Foreman Zipcode</label>
                      <input
                      type="text"
                      className="form-control"
@@ -158,7 +158,7 @@ const Work_Package_Form = (props) => {
                      required
                      />
 
-                      <label htmlFor="position" className="form-label">Position</label>
+                      <label htmlFor="position" className="form-label">PM or Foreman Position</label>
                      <input
                      type="text"
                      className="form-control"
@@ -168,7 +168,7 @@ const Work_Package_Form = (props) => {
                      required
                      />
 
-                      <label htmlFor="pay_rate" className="form-label">Pay Rate</label>
+                      <label htmlFor="pay_rate" className="form-label">PM or Foreman Pay Rate</label>
                      <input
                      type="text"
                      className="form-control"
@@ -178,7 +178,7 @@ const Work_Package_Form = (props) => {
                      required
                      />
 
-                      <label htmlFor="years_employed" className="form-label">Years Employed</label>
+                      <label htmlFor="years_employed" className="form-label">PM or Foreman Years Employed</label>
                      <input
                      type="text"
                      className="form-control"
