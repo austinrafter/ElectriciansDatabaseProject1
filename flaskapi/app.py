@@ -61,6 +61,48 @@ def check_user_position_general_manager(first_name,last_name,Address,city,state,
     else:
         print("you are not a general manager and can't view that")
 
+def position_check_fm(first_name,last_name,Address,city,state,zipcode,position_name):
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
+    city_state_zip = cursor.fetchone()
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s ", [first_name,last_name,Address,city_state_zip[0]])
+    person = cursor.fetchone()
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
+    position = cursor.fetchone()
+    cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = %s AND POSITION_ID=%s", [person[0], position[0]])
+    check_position= cursor.fetchone()
+    if check_position[0] == position[0]:
+        return True
+    else:
+        return False
+
+def position_check_pm(first_name,last_name,Address,city,state,zipcode,position_name):
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
+    city_state_zip = cursor.fetchone()
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s", [first_name,last_name,Address,city_state_zip[0]])
+    person = cursor.fetchone()
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
+    position = cursor.fetchone()
+    cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = %s AND POSITION_ID= %s", [person[0], position[0]])
+    check_position= cursor.fetchone()
+    if check_position[0] == position[0]:
+        return True
+    else:
+        return False
+
+def position_check_gm(first_name,last_name,Address,city,state,zipcode,position_name):
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
+    city_state_zip = cursor.fetchone()
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s ", [first_name,last_name,Address,city_state_zip[0]])
+    person = cursor.fetchone()
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
+    position = cursor.fetchone()
+    cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = %s AND POSITION_ID=%s", [person[0], position[0]])
+    check_position = cursor.fetchone()
+    if check_position[0] == position[0]:
+        return True
+    else:
+        return False
+
 @app.route("/foreman" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def foreman():
@@ -129,13 +171,27 @@ def general_manager():
 @app.route("/hours_used" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def change_hours_used_on_work_package():
-    job = request.form['job']
-    work_package_name = request.form['work_package_name']
-    hours_used = request.form['hours_used']
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=?", [job])
-    job_id = cursor.fetchone();
-    cursor.execute("UPDATE WORK_PACKAGE SET HOURS_USED = ? WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [hours_used,work_package_name, job_id[0]])
-    conn.commit()
+    job = request.json['job']
+    work_package_name = request.json['work_package_name']
+    hours_used = request.json['hours_used']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zip']
+    years_employed = request.json['years_employed']
+    foreman = position_check_fm(first_name,last_name,position,address,city,state,zipcode,years_employed)
+    if foreman:
+
+        cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=?", [job])
+        job_id = cursor.fetchone();
+        cursor.execute("UPDATE WORK_PACKAGE SET HOURS_USED = ? WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [hours_used,work_package_name, job_id[0]])
+        conn.commit()
+        return jsonify(hours_used)
+    else:
+        return False
 
 def change_material_amount_used_in_work_package(work_package_name, job_site_name, inventory_name, amount_used):
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [job_site_name])
@@ -183,7 +239,7 @@ def get_general_manager_view(job_site_name):
 def insert_into_location(location_name):
     cursor.execute("SELECT LOCATION_ID FROM LOCATION WHERE LOCATION_NAME = %s", [location_name])
     location = cursor.fetchone()
-    if location[0] != None:
+    if location[0] == None:
         cursor.execute("INSERT INTO LOCATION (LOCATION_NAME) VALUES (?);", [location_name])
         conn.commit()
 
@@ -193,8 +249,11 @@ def delete_from_location(location_name):
 
 
 def insert_into_city_state_zip(city,state,zipcode):
-    cursor.execute("INSERT INTO CITY_STATE_ZIP (CITY,STATE,ZIPCODE) VALUES (?,?,?);", [city,state,zipcode])
-    conn.commit()
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s;", [city, state, zipcode])
+    id = cursor.fetchone
+    if id[0] == None:
+        cursor.execute("INSERT INTO CITY_STATE_ZIP (CITY,STATE,ZIPCODE) VALUES (?,?,?);", [city,state,zipcode])
+        conn.commit()
 
 def delete_from_city_state_zip(city,state,zipcode):
     cursor.execute("DELETE FROM CITY_STATE_ZIP WHERE CITY= ? AND STATE = ? AND ZIPCODE = ?);", [city,state,zipcode])
@@ -203,10 +262,14 @@ def delete_from_city_state_zip(city,state,zipcode):
 
 
 def insert_into_person(first_name,last_name,Address,city,state,zipcode):
+    insert_into_city_state_zip(city,state,zipcode)
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
-    cursor.execute("INSERT INTO PERSON (FIRST_NAME,LAST_NAME,ADDRESS, CITY_STATE_ZIP_ID) VALUES (?,?,?,?);", [first_name,last_name, Address, city_state_zip[0]])
-    conn.commit()
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME = %s AND LAST_NAME = %s AND ADDRESS = %S AND CITY_STATE_ZIP_ID = %s;",[first_name, last_name, Address, city_state_zip[0]])
+    person = cursor.fetchone()
+    if person[0] == None:
+        cursor.execute("INSERT INTO PERSON (FIRST_NAME,LAST_NAME,ADDRESS, CITY_STATE_ZIP_ID) VALUES (?,?,?,?);", [first_name,last_name, Address, city_state_zip[0]])
+        conn.commit()
 
 def delete_from_person(first_name,last_name,Address,city,state,zipcode):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
@@ -227,8 +290,11 @@ def delete_from_inventory(material_name, cost_per_unit, weight_per_unit):
 
 
 def insert_into_position(position):
-    cursor.execute(" INSERT INTO EMPLOYEE_POSITION (POSITION_NAME) VALUES (?);", [position])
-    conn.commit()
+    cursor.execute(" SELECT POSITION_ID FROM  EMPLOYEE_POSITION WHERE POSITION_NAME = %s;", [position])
+    position = cursor.fetchone()
+    if position[0] == None:
+        cursor.execute(" INSERT INTO EMPLOYEE_POSITION (POSITION_NAME) VALUES (?);", [position])
+        conn.commit()
 
 def delete_from_position(position):
     cursor.execute(" DELETE FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?;", [position])
@@ -239,8 +305,11 @@ def delete_from_position(position):
 def insert_into_job_site(location_name, site_name, start_date):
     cursor.execute("SELECT LOCATION_ID FROM LOCATION WHERE LOCATION_NAME=?", [location_name])
     location = cursor.fetchone()
-    cursor.execute("INSERT INTO JOB_SITE (SITE_NAME,LOCATION_ID,START_DATE) VALUES (?,?,?);", [site_name, location[0],start_date])
-    conn.commit()
+    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %S AND LOCATION_ID = %S AND START_DATE = %s;", [site_name, location[0], start_date])
+    job = cursor.fetchone()
+    if job[0] == None:
+        cursor.execute("INSERT INTO JOB_SITE (SITE_NAME,LOCATION_ID,START_DATE) VALUES (?,?,?);", [site_name, location[0],start_date])
+        conn.commit()
 
 def delete_from_job_site(location_name, site_name, start_date):
     cursor.execute("SELECT LOCATION_ID FROM LOCATION WHERE LOCATION_NAME=?", [location_name])
@@ -265,40 +334,36 @@ def delete_from_work_package(job_site_name, work_package_name, price_of_work, ho
 
 
 def insert_into_electrician(first_name,last_name,Address,city,state,zipcode, years_employed, hourly_rate, position_name):
+    insert_into_city_state_zip(city, state, zipcode)
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
-    if city_state_zip == None:
-        cursor.execute("INSERT INTO CITY_STATE_ZIP (CITY,STATE,ZIPCODE) VALUES (?,?,?);", [city,state,zipcode])
-        conn.commit()
+    insert_into_person(first_name,last_name,Address,city,state,zipcode)
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
-    if person == None:
-        cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
-        city_state_zip = cursor.fetchone()
-        cursor.execute("INSERT INTO PERSON (FIRST_NAME,LAST_NAME,ADDRESS, CITY_STATE_ZIP_ID) VALUES (?,?,?,?);", [first_name,last_name, Address, city_state_zip[0]])
-        conn.commit()
+    insert_into_position(position_name)
     cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
     position = cursor.fetchone()
-    cursor.execute("INSERT INTO ELECTRICIAN(PERSON_ID,POSITION_ID,YEARS_EMPLOYED, HOURLY_RATE) VALUES (?, ?, ?, ?);", [person[0],position[0],years_employed,hourly_rate])
-    conn.commit()
+    cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN WHERE PERSON_ID = %s AND POSITION_ID = %s AND YEARS_EMPLOYED = %s AND HOURLY_RATE = %s;",[person[0], position[0], years_employed, hourly_rate])
+    electrician = cursor.fetchone()
+    if electrician[0] == None:
+        cursor.execute("INSERT INTO ELECTRICIAN(PERSON_ID,POSITION_ID,YEARS_EMPLOYED, HOURLY_RATE) VALUES (?, ?, ?, ?);", [person[0],position[0],years_employed,hourly_rate])
+        conn.commit()
 
 def insert_into_salaried_employee(first_name,last_name,Address,city,state,zipcode, years_employed, salary_rate, position_name):
+    insert_into_city_state_zip(city,state,zipcode)
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
-    if city_state_zip == None:
-        cursor.execute("INSERT INTO CITY_STATE_ZIP (CITY,STATE,ZIPCODE) VALUES (?,?,?);", [city,state,zipcode])
-        conn.commit()
+    insert_into_person(first_name,last_name,Address,city,state,zipcode)
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
-    if person == None:
-        cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
-        city_state_zip = cursor.fetchone()
-        cursor.execute("INSERT INTO PERSON (FIRST_NAME,LAST_NAME,ADDRESS, CITY_STATE_ZIP_ID) VALUES (?,?,?,?);", [first_name,last_name, Address, city_state_zip[0]])
-        conn.commit()
+    insert_into_position(position_name)
     cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
     position = cursor.fetchone()
-    cursor.execute("INSERT INTO SALARIED_EMPLOYEE(PERSON_ID,POSITION_ID,YEARS_EMPLOYED, SALARY_RATE) VALUES (?, ?, ?, ?);", [person[0],position[0],years_employed,salary_rate])
-    conn.commit()
+    cursor.execute("SELECT SALARIED_EMPLOYEE_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID=%s AND POSITION_ID=%s AND YEARS_EMPLOYED=%s AND SALARY_RATE=%s;",[person[0], position[0], years_employed, salary_rate])
+    salary = cursor.fetchone()
+    if salary == None:
+        cursor.execute("INSERT INTO SALARIED_EMPLOYEE(PERSON_ID,POSITION_ID,YEARS_EMPLOYED, SALARY_RATE) VALUES (?, ?, ?, ?);", [person[0],position[0],years_employed,salary_rate])
+        conn.commit()
 
 def delete_from_electrician(first_name,last_name,Address,city,state,zipcode, years_employed, hourly_rate, position_name):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
@@ -313,11 +378,14 @@ def delete_from_electrician(first_name,last_name,Address,city,state,zipcode, yea
 
 
 def insert_into_electrician_on_work_package(first_name,last_name,position_name,address, work_package_name, job_site_name):
+    insert_into_position(position_name)
     cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
     position = cursor.fetchone()
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? ", [first_name,last_name,address])
     person = cursor.fetchone()
-    cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN WHERE PERSON_ID = ? AND POSITION_ID = ?", [person,position[0]])
+    if person[0] == None:
+        return "This person is not in our system"
+    cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN WHERE PERSON_ID = ? AND POSITION_ID = ?", [person[0],position[0]])
     electrician = cursor.fetchone()
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [job_site_name])
     job_site = cursor.fetchone()
@@ -438,15 +506,6 @@ def work_packages():
         return jsonify([e.serialize() for e in work_packages])
 
 
-
-def get_work_packages_on_job(job_site_name):
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [job_site_name])
-    job_site = cursor.fetchone()
-    cursor.execute("SELECT WORK_PACKAGE_NAME, PRICE_OF_WORK, HOURS_ALLOTED, HOURS_USED FROM WORK_PACKAGE WHERE JOB_SITE_ID = %s", [job_site[0]])
-    work_packages = cursor.fetchall()
-    for x in work_packages:
-        print("Work package name: " + x[0] + "\nJob site of work package: " + job_site_name +"\nPrice charged to customer: " + str(x[1]) + "\nHours alloted for work: " + str(x[2]) +"\nHours used for work: " + str(x[3]) + '\n\n')
-
 def get_jobs_by_location(location_name):
     val = [location_name]
     cursor.execute("SELECT * FROM LOCATION")
@@ -478,22 +537,38 @@ def add_work_package():
     price_of_work = request.form['price_of_work']
     hours_alloted = request.form['hours_alloted']
     hours_used = request.form['hours_used']
-    insert_into_work_package(job, work_package_name, price_of_work, hours_alloted)
-    work_package = WorkPackages(job,work_package_name,price_of_work,hours_alloted,hours_used)
-    return jsonify(work_package)
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zip']
+    years_employed = request.json['years_employed']
+    if position == 'Project Manager':
+      upper_management =  position_check_pm(first_name,last_name,address,city,state,zipcode, position)
+    elif position == 'Foreman':
+        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
+    if upper_management:
+        insert_into_work_package(job, work_package_name, price_of_work, hours_alloted)
+        work_package = WorkPackages(job,work_package_name,price_of_work,hours_alloted,hours_used)
+        return jsonify(work_package)
+    else:
+        return "You can't add work packages"
+
 
 @app.route("/add_employee", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_employee():
-    first_name = request.form['first_name']
-    last_name = request.form['last_name']
-    position = request.form['position']
-    address = request.form['address']
-    city = request.form['city']
-    state = request.form['state']
-    zipcode = request.form['zipcode']
-    years_employed = request.form['years_employed']
-    pay_rate = request.form['pay_rate']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+    years_employed = request.json['years_employed']
+    pay_rate = request.json['pay_rate']
     if (position == "Inside Wireman") or (position == "Residential Wireman"):
         insert_into_electrician(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
     else:
