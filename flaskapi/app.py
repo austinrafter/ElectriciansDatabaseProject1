@@ -184,7 +184,6 @@ def change_hours_used_on_work_package():
     years_employed = request.json['years_employed']
     foreman = position_check_fm(first_name,last_name,position,address,city,state,zipcode,years_employed)
     if foreman:
-
         cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=?", [job])
         job_id = cursor.fetchone();
         cursor.execute("UPDATE WORK_PACKAGE SET HOURS_USED = ? WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [hours_used,work_package_name, job_id[0]])
@@ -314,8 +313,11 @@ def insert_into_job_site(location_name, site_name, start_date):
 def delete_from_job_site(location_name, site_name, start_date):
     cursor.execute("SELECT LOCATION_ID FROM LOCATION WHERE LOCATION_NAME=?", [location_name])
     location = cursor.fetchone()
-    cursor.execute("DELETE FROM JOB_SITE WHERE SITE_NAME = ? AND LOCATION_ID = ? AND START_DATE = ?;", [site_name, location[0],start_date])
-    conn.commit()
+    if location == None:
+        return "Unable to delete a job with location that does not exist"
+    else:
+        cursor.execute("DELETE FROM JOB_SITE WHERE SITE_NAME = ? AND LOCATION_ID = ? AND START_DATE = ?;", [site_name, location[0],start_date])
+        conn.commit()
 
 
 
@@ -518,9 +520,36 @@ def get_jobs_by_location(location_name):
     for job in jobs:
         print("Job Name: " +job[0] + "\nLocation: " + location_name +  "\nStart date: " + str(job[1]) + "\n\n")
 
+@app.route("/delete_job", methods=["POST"], strict_slashes=False)
+@cross_origin()
+def delete_job():
+    location = request.form['location']
+    site_name = request.form['site_name']
+    start = request.form['start']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+
+    general_manager = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
+    if general_manager:
+        delete = delete_from_job_site(location, site_name, start)
+        if delete == None:
+            job = Jobs(1,location,site_name,start)
+            return jsonify(job)
+        else:
+            job = Jobs(1, "Job does not exist", "Job does not exist", start)
+            return jsonify(job)
+    else:
+        job = Jobs(1, "You are not a general manager and may not add new jobs", "You are not a general manager and may not add new jobs", start)
+        return jsonify(job)
+
 @app.route("/add_job", methods=["POST"], strict_slashes=False)
 @cross_origin()
-def add_jobs():
+def add_job():
     location = request.form['location']
     site_name = request.form['site_name']
     start = request.form['start']
@@ -539,7 +568,8 @@ def add_jobs():
         job = Jobs(1,location,site_name,start)
         return jsonify(job)
     else:
-        return "You are not a general manager and may not add new jobs"
+        job = Jobs(1, "You are not a general manager and may not add new jobs", "You are not a general manager and may not add new jobs", start)
+        return jsonify(job)
 
 @app.route("/add_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -566,7 +596,8 @@ def add_work_package():
         work_package = WorkPackages(1,job,work_package_name,price_of_work,hours_alloted,hours_used)
         return jsonify(work_package)
     else:
-        return "You can't add work packages"
+        work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", price_of_work, hours_alloted, hours_used)
+        return jsonify(work_package)
 
 
 @app.route("/add_employee", methods=["POST"], strict_slashes=False)
@@ -597,7 +628,8 @@ def add_employee():
         employee = Employees(1, first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed)
         return jsonify(employee)
     else:
-        return "You are unable to add an employee"
+        employee = Employees(1, "You are not a general manager and may not add new employees", "You are not a general manager and may not add new employees", "You are not a general manager and may not add new employees","You are not a general manager and may not add new employees","You are not a general manager and may not add new employees",0,"You are not a general manager and may not add new employees",0,0)
+        return jsonify(employee)
 
 
 

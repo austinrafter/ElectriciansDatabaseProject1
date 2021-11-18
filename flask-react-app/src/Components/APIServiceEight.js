@@ -1,6 +1,6 @@
-export default class APIService{
-    static InsertJob(body){
-    return fetch('http://localhost:5000/add_job',{
+export default class APIServiceEight{
+    static DeleteJob(body){
+    return fetch('http://localhost:5000/delete_job',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},
@@ -9,6 +9,3 @@ export default class APIService{
     .catch(error => console.log(error))
     }
 }
-
-
-

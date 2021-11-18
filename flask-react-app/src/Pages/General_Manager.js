@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import PositionAuthenticationFormThree from '../Components/AuthenticateSalariedEmployeesThree';
 import JobForm from '../Components/Job_form';
 import Employee_Form from '../Components/Employee_Form';
+import JobFormDelete from '../Components/JobFormDelete';
 
 const General_Manager = () => {
 
@@ -25,6 +26,7 @@ const findEmployee = (employee) =>{
   const [employees, setEmployees] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [showFormTwo, setShowFormTwo] = useState(false);
+  const [showFormThree, setShowFormThree] = useState(false);
   const [showFormFour, setShowFormFour] = useState(false);
 
    const toggleShowForm = () => {
@@ -33,6 +35,10 @@ const findEmployee = (employee) =>{
 
   const toggleShowFormTwo = () => {
     setShowFormTwo(!showFormTwo);
+  }
+
+  const toggleShowFormThree = () => {
+    setShowFormThree(!showFormThree);
   }
 
   const toggleShowFormFour = () => {
@@ -68,6 +74,20 @@ const findEmployee = (employee) =>{
             />
             )}
             </div>
+    <div>
+    <button
+          onClick={toggleShowFormThree}
+          className="btn btn-primary"
+           >
+             Delete a job
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+         {showFormThree && (
+          <JobFormDelete
+          insertedJob = {insertedJob}
+            />
+            )}
+            </div>
      <div>
     <button
           onClick={toggleShowForm}
@@ -82,6 +102,7 @@ const findEmployee = (employee) =>{
             />
             )}
             </div>
+
   </div>
   )
 
