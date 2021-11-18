@@ -319,16 +319,16 @@ def delete_from_job_site(location_name, site_name, start_date):
 
 
 
-def insert_into_work_package(job_site_name, work_package_name, price_of_work, hours_alloted):
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [job_site_name])
+def insert_into_work_package(job_site_name, work_package_name, price_of_work, hours_alloted, hours_used):
+    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [job_site_name])
     job_site = cursor.fetchone()
-    cursor.execute("INSERT INTO WORK_PACKAGE (JOB_SITE_ID ,WORK_PACKAGE_NAME ,PRICE_OF_WORK, HOURS_ALLOTED,HOURS_USED) VALUES (?,?,?,?);", [job_site[0], work_package_name, price_of_work, hours_alloted,0])
+    cursor.execute("INSERT INTO WORK_PACKAGE (JOB_SITE_ID ,WORK_PACKAGE_NAME ,PRICE_OF_WORK, HOURS_ALLOTED,HOURS_USED) VALUES (%s,%s,%s,%s,%s);", [job_site[0], work_package_name, price_of_work, hours_alloted,hours_used])
     conn.commit()
 
 def delete_from_work_package(job_site_name, work_package_name, price_of_work, hours_alloted):
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [job_site_name])
+    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [job_site_name])
     job_site = cursor.fetchone()
-    cursor.execute("DELETE FROM WORK_PACKAGE WHERE JOB_SITE_ID = ? AND WORK_PACKAGE_NAME = ? AND PRICE_OF_WORK = ? AND  HOURS_ALLOTED,HOURS_USED = ?;", [job_site[0], work_package_name, price_of_work, hours_alloted,0])
+    cursor.execute("DELETE FROM WORK_PACKAGE WHERE JOB_SITE_ID = %s AND WORK_PACKAGE_NAME = %s AND PRICE_OF_WORK = %s AND  HOURS_ALLOTED,HOURS_USED = %s;", [job_site[0], work_package_name, price_of_work, hours_alloted,0])
     conn.commit()
 
 
@@ -532,26 +532,26 @@ def add_jobs():
 @app.route("/add_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_work_package():
-    job = request.form['job']
-    work_package_name = request.form['work_package_name']
-    price_of_work = request.form['price_of_work']
-    hours_alloted = request.form['hours_alloted']
-    hours_used = request.form['hours_used']
+    job = request.json['job']
+    work_package_name = request.json['work_package_name']
+    price_of_work = request.json['price_of_work']
+    hours_alloted = request.json['hours_alloted']
+    hours_used = request.json['hours_used']
     first_name = request.json['first_name']
     last_name = request.json['last_name']
     position = request.json['position']
     address = request.json['address']
     city = request.json['city']
     state = request.json['state']
-    zipcode = request.json['zip']
+    zipcode = request.json['zipcode']
     years_employed = request.json['years_employed']
     if position == 'Project Manager':
       upper_management =  position_check_pm(first_name,last_name,address,city,state,zipcode, position)
     elif position == 'Foreman':
         upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
     if upper_management:
-        insert_into_work_package(job, work_package_name, price_of_work, hours_alloted)
-        work_package = WorkPackages(job,work_package_name,price_of_work,hours_alloted,hours_used)
+        insert_into_work_package(job, work_package_name, price_of_work, hours_alloted, hours_used)
+        work_package = WorkPackages(1,job,work_package_name,price_of_work,hours_alloted,hours_used)
         return jsonify(work_package)
     else:
         return "You can't add work packages"

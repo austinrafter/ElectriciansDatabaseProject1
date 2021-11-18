@@ -34,6 +34,7 @@ const checkPosition = () =>{
 
     return (
         <div className="mt-2">
+        <h3> "Double click the button under a job to see the work packages for that job" </h3>
         {/* Display the job details if job is not None */}
         {props.jobs && props.jobs.map(job =>{
         return (

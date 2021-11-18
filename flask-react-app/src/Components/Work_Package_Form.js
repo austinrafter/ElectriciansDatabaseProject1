@@ -17,10 +17,11 @@ const Work_Package_Form = (props) => {
     const [pay_rate, setPayRate] = useState('')
     const [years_employed, setYearsEmployed] = useState('')
     const [job, setJob] = useState('')
+    const [work_package, setWorkPackage] = useState('')
 
     const insertWorkPackage = () =>{
-    APIServiceTwo.InsertWorkPackage({work_package_name, price_of_work, hours_alloted, hours_used, first_name,last_name, address, city, state, zipcode,position, pay_rate, years_employed})
-    .then((response) => props.insertedWorkPackage(response))
+    APIServiceTwo.InsertWorkPackage({work_package_name, price_of_work, hours_alloted, hours_used, first_name,last_name, address, city, state, zipcode,position, pay_rate, years_employed, job})
+    .then((response) => setWorkPackage(response))
           .catch(error => console.log('error',error))
           }
 

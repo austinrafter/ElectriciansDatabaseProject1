@@ -1,5 +1,5 @@
 export default class APIServiceTwo{
-    static InsertWorkPackageb(body){
+    static InsertWorkPackage(body){
     return fetch('http://localhost:5000/add_work_package',{
     'method': 'POST',
     headers : {
