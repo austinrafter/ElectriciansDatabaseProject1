@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import APIServiceEight from '../Components/APIServiceEight.js'
+import JobsList from '../Components/JobsList'
 
 
 const JobFormDelete = (props) => {
@@ -13,10 +14,11 @@ const JobFormDelete = (props) => {
     const [state, setState] = useState('')
     const [zipcode, setZipCode] = useState('')
     const [position, setPosition] = useState('')
+    const [jobs, setJobs] = useState([])
 
     const insertJob = () =>{
     APIServiceEight.DeleteJob({site_name, location, start_date,first_name,last_name,address,city,state,zipcode,position})
-    .then((response) => props.insertedJob(response))
+    .then((response) => setJobs(response))
           .catch(error => console.log('error',error))
           }
 
@@ -145,6 +147,8 @@ const JobFormDelete = (props) => {
                      >
                      Delete job</button>
                    </form>
+
+                   <JobsList jobs = {jobs} />
            </div>
       )}
 

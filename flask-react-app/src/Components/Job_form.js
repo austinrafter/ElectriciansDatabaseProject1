@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import APIService from '../Components/ApiService.js'
-
+import JobsList from '../Components/JobsList'
 
 const JobForm = (props) => {
     const [location, setLocation] = useState('')
@@ -13,10 +13,11 @@ const JobForm = (props) => {
     const [state, setState] = useState('')
     const [zipcode, setZipCode] = useState('')
     const [position, setPosition] = useState('')
+    const [jobs, setJobs] = useState([])
 
     const insertJob = () =>{
     APIService.InsertJob({site_name, location, start_date,first_name,last_name,address,city,state,zipcode,position})
-    .then((response) => props.insertedJob(response))
+    .then((response) => setJobs(response))
           .catch(error => console.log('error',error))
           }
 
@@ -145,6 +146,7 @@ const JobForm = (props) => {
                      >
                      Add job</button>
                    </form>
+                   <JobsList jobs = {jobs} />
            </div>
       )}
 

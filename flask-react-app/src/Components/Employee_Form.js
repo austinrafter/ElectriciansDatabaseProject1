@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import APIServiceThree from '../Components/ApiServiceThree.js'
+import EmployeesList from '../Components/EmployeesList'
 
 
 const Employee_Form = (props) => {
@@ -221,6 +222,7 @@ const Employee_Form = (props) => {
                      > Add Employee</button>
 
                    </form>
+                   <EmployeesList employees = {employees} />
            </div>
       )}
 
