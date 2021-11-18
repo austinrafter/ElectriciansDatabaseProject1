@@ -522,12 +522,24 @@ def get_jobs_by_location(location_name):
 @cross_origin()
 def add_jobs():
     location = request.form['location']
-    site = request.form['site']
+    site_name = request.form['site_name']
     start = request.form['start']
-    insert_into_location(location)
-    insert_into_job_site(location, site, start)
-    job = Jobs(location,site,start)
-    return jsonify(job)
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+
+    general_manager = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
+    if general_manager:
+        insert_into_location(location)
+        insert_into_job_site(location, site_name, start)
+        job = Jobs(1,location,site_name,start)
+        return jsonify(job)
+    else:
+        return "You are not a general manager and may not add new jobs"
 
 @app.route("/add_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -569,12 +581,23 @@ def add_employee():
     zipcode = request.json['zipcode']
     years_employed = request.json['years_employed']
     pay_rate = request.json['pay_rate']
-    if (position == "Inside Wireman") or (position == "Residential Wireman"):
-        insert_into_electrician(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
+    first_name_gm = request.json['first_name_gm']
+    last_name_gm = request.json['last_name_gm']
+    position_gm = request.json['position_gm']
+    address_gm = request.json['address_gm']
+    city_gm = request.json['city_gm']
+    state_gm = request.json['state_gm']
+    zipcode_gm = request.json['zipcode_gm']
+    general_man = position_check_gm(first_name_gm,last_name_gm,address_gm,city_gm,state_gm,zipcode_gm,position_gm)
+    if general_man:
+        if (position == "Inside Wireman") or (position == "Residential Wireman"):
+          insert_into_electrician(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
+        else:
+            insert_into_salaried_employee(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
+        employee = Employees(1, first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed)
+        return jsonify(employee)
     else:
-        insert_into_salaried_employee(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
-    employee = Employees( first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed)
-    return jsonify(employee)
+        return "You are unable to add an employee"
 
 
 

@@ -6,9 +6,16 @@ const JobForm = (props) => {
     const [location, setLocation] = useState('')
     const [site_name, setSiteName] = useState('')
     const [start_date, setStartDate] = useState('')
+    const [first_name, setFirstName] = useState('')
+    const [last_name, setLastName] = useState('')
+    const [address, setAddress] = useState('')
+    const [city, setCity] = useState('')
+    const [state, setState] = useState('')
+    const [zipcode, setZipCode] = useState('')
+    const [position, setPosition] = useState('')
 
     const insertJob = () =>{
-    APIService.InsertJob({site_name, location, start_date})
+    APIService.InsertJob({site_name, location, start_date,first_name,last_name,address,city,state,zipcode,position})
     .then((response) => props.insertedJob(response))
           .catch(error => console.log('error',error))
           }
@@ -19,6 +26,13 @@ const JobForm = (props) => {
           setLocation('')
           setSiteName('')
           setStartDate('')
+          setFirstName('')
+          setLastName('')
+          setAddress('')
+          setCity('')
+          setState('')
+          setZipCode('')
+          setPosition('')
         }
 
       return (
@@ -54,6 +68,77 @@ const JobForm = (props) => {
                       onChange={(e)=>setStartDate(e.target.value)}
                       required
                       />
+
+                      <h2> "This section to confirm you are a General Manager in our system" </h2>
+                      <label htmlFor="first_name" className="form-label">Employee First Name</label>
+                      <input
+                      type="text"
+                      className="form-control"
+                      placeholder ="Enter last name"
+                      value={first_name}
+                      onChange={(e)=>setFirstName(e.target.value)}
+                      required
+                      />
+
+                      <label htmlFor="last_name" className="form-label">Employee Last Name</label>
+                      <input
+                      type="text"
+                      className="form-control"
+                      placeholder ="Enter last name"
+                      value={last_name}
+                      onChange={(e)=>setLastName(e.target.value)}
+                      required
+                      />
+
+                      <label htmlFor="address" className="form-label">Employee Address</label>
+                      <input
+                      type="text"
+                      className="form-control"
+                      placeholder ="Enter address"
+                      value={address}
+                      onChange={(e)=>setAddress(e.target.value)}
+                      required
+                      />
+
+                       <label htmlFor="city" className="form-label">Employee City</label>
+                     <input
+                     type="text"
+                     className="form-control"
+                     placeholder ="Enter city"
+                     value={city}
+                     onChange={(e)=>setCity(e.target.value)}
+                     required
+                     />
+
+                      <label htmlFor="state" className="form-label">Employee State</label>
+                     <input
+                     type="text"
+                     className="form-control"
+                     placeholder ="Enter state"
+                     value={state}
+                     onChange={(e)=>setState(e.target.value)}
+                     required
+                     />
+
+                      <label htmlFor="zipcode" className="form-label">Employee Zipcode</label>
+                     <input
+                     type="text"
+                     className="form-control"
+                     placeholder ="Enter zip code"
+                     value={zipcode}
+                     onChange={(e)=>setZipCode(e.target.value)}
+                     required
+                     />
+
+                      <label htmlFor="position" className="form-label">Employee Position</label>
+                     <input
+                     type="text"
+                     className="form-control"
+                     placeholder ="Enter position"
+                     value={position}
+                     onChange={(e)=>setPosition(e.target.value)}
+                     required
+                     />
 
                      <button
                      className="btn btn-primary mt-2"

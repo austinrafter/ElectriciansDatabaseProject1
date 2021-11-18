@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
 import PositionAuthenticationFormThree from '../Components/AuthenticateSalariedEmployeesThree';
 import JobForm from '../Components/Job_form';
+import Employee_Form from '../Components/Employee_Form';
 
 const General_Manager = () => {
 
 const insertedJob = (job) =>{
     const new_jobs = [...jobs,job]
     setJobs(new_jobs)
+  }
+
+const findEmployee = (employee) =>{
+    const new_Employee = [...employees,employee]
+    setEmployees(new_Employee)
   }
 
   const findGeneralManager = (general_manager) =>{
@@ -16,8 +22,14 @@ const insertedJob = (job) =>{
 
   const [general_managers, setGeneralManagers] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [showForm, setShowForm] = useState(false);
   const [showFormTwo, setShowFormTwo] = useState(false);
   const [showFormFour, setShowFormFour] = useState(false);
+
+   const toggleShowForm = () => {
+    setShowForm(!showForm);
+  }
 
   const toggleShowFormTwo = () => {
     setShowFormTwo(!showFormTwo);
@@ -53,6 +65,20 @@ const insertedJob = (job) =>{
          {showFormTwo && (
           <JobForm
           insertedJob = {insertedJob}
+            />
+            )}
+            </div>
+     <div>
+    <button
+          onClick={toggleShowForm}
+          className="btn btn-primary"
+           >
+             Add an employee
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+         {showForm && (
+          <Employee_Form
+          findEmployee = {findEmployee}
             />
             )}
             </div>

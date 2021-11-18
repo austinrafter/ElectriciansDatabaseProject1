@@ -12,6 +12,7 @@ const addWorkPackage = (work_package) =>{
     const new_workPackages = [...work_packages,work_package]
     setWorkPackages(new_workPackages)
   }
+
  const [foremen, setForemen] = useState([]);
  const [work_packages, setWorkPackages] = useState([]);
 

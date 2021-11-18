@@ -99,6 +99,8 @@ const Work_Package_Form = (props) => {
                      required
                      />
 
+                     <h2> "This section to confirm you are a Foreman or Project Manager in our system" </h2>
+
                      <label htmlFor="first_name" className="form-label">PM or Foreman First Name</label>
                       <input
                       type="text"
