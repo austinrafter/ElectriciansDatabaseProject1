@@ -330,8 +330,11 @@ def insert_into_work_package(job_site_name, work_package_name, price_of_work, ho
 def delete_from_work_package(job_site_name, work_package_name, price_of_work, hours_alloted):
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [job_site_name])
     job_site = cursor.fetchone()
+    if job_site == None:
+        return False
     cursor.execute("DELETE FROM WORK_PACKAGE WHERE JOB_SITE_ID = %s AND WORK_PACKAGE_NAME = %s AND PRICE_OF_WORK = %s AND  HOURS_ALLOTED,HOURS_USED = %s;", [job_site[0], work_package_name, price_of_work, hours_alloted,0])
     conn.commit()
+    return True
 
 
 
@@ -370,12 +373,36 @@ def insert_into_salaried_employee(first_name,last_name,Address,city,state,zipcod
 def delete_from_electrician(first_name,last_name,Address,city,state,zipcode, years_employed, hourly_rate, position_name):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
+    if city_state_zip == None:
+        return False
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
+    if person == None:
+        return False
     cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
     position = cursor.fetchone()
+    if position == None:
+        return False
     cursor.execute("DELETE FROM ELECTRICIAN WHERE PERSON_ID = ? AND POSITION_ID = ? AND YEARS_EMPLOYED = ? AND HOURLY_RATE = ?;", [person[0],position[0],years_employed,hourly_rate])
     conn.commit()
+    return True
+
+def delete_from_salaried_employee(first_name,last_name,Address,city,state,zipcode, years_employed, salary_rate, position_name):
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
+    city_state_zip = cursor.fetchone()
+    if city_state_zip == None:
+        return False
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
+    person = cursor.fetchone()
+    if person == None:
+        return False
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
+    position = cursor.fetchone()
+    if position == None:
+        return False
+    cursor.execute("DELETE FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID = ? AND YEARS_EMPLOYED = ? AND SALARY_RATE = ?;", [person[0],position[0],years_employed,salary_rate])
+    conn.commit()
+    return True
 
 
 
@@ -599,6 +626,38 @@ def add_work_package():
         work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", price_of_work, hours_alloted, hours_used)
         return jsonify(work_package)
 
+@app.route("/delete_work_package", methods=["POST"], strict_slashes=False)
+@cross_origin()
+def delete_work_package():
+    job = request.json['job']
+    work_package_name = request.json['work_package_name']
+    price_of_work = request.json['price_of_work']
+    hours_alloted = request.json['hours_alloted']
+    hours_used = request.json['hours_used']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+    years_employed = request.json['years_employed']
+    if position == 'Project Manager':
+      upper_management =  position_check_pm(first_name,last_name,address,city,state,zipcode, position)
+    elif position == 'Foreman':
+        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
+    if upper_management:
+        work = delete_from_work_package(job, work_package_name, price_of_work, hours_alloted, hours_used)
+        if work == False:
+            work_package = WorkPackages(1,"that is not a work package for this job","that is not a work package for this job",price_of_work,hours_alloted,hours_used)
+            return jsonify(work_package)
+        else:
+            work_package = WorkPackages(1,job,work_package_name,price_of_work,hours_alloted,hours_used)
+            return jsonify(work_package)
+    else:
+        work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", price_of_work, hours_alloted, hours_used)
+        return jsonify(work_package)
+
 
 @app.route("/add_employee", methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -627,6 +686,52 @@ def add_employee():
             insert_into_salaried_employee(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
         employee = Employees(1, first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed)
         return jsonify(employee)
+    else:
+        employee = Employees(1, "You are not a general manager and may not add new employees", "You are not a general manager and may not add new employees", "You are not a general manager and may not add new employees","You are not a general manager and may not add new employees","You are not a general manager and may not add new employees",0,"You are not a general manager and may not add new employees",0,0)
+        return jsonify(employee)
+
+@app.route("/delete_employee", methods=["POST"], strict_slashes=False)
+@cross_origin()
+def delete_employee():
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+    years_employed = request.json['years_employed']
+    pay_rate = request.json['pay_rate']
+    first_name_gm = request.json['first_name_gm']
+    last_name_gm = request.json['last_name_gm']
+    position_gm = request.json['position_gm']
+    address_gm = request.json['address_gm']
+    city_gm = request.json['city_gm']
+    state_gm = request.json['state_gm']
+    zipcode_gm = request.json['zipcode_gm']
+    general_man = position_check_gm(first_name_gm,last_name_gm,address_gm,city_gm,state_gm,zipcode_gm,position_gm)
+    if general_man:
+        if (position == "Inside Wireman") or (position == "Residential Wireman"):
+          electrician = delete_from_electrician(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
+          if electrician == False:
+              employee = Employees(1, "that is not an electrician in this company","that is not an electrician in this company","that is not an electrician in this company","that is not an electrician in this company","that is not an electrician in this company",zipcode,"that is not an electrician in this company",pay_rate,years_employed)
+              return jsonify(employee)
+          else:
+              employee = Employees(1, first_name, last_name, address, city, state, zipcode, position, pay_rate, years_employed)
+              return jsonify(employee)
+        else:
+            salaried = delete_from_salaried_employee(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
+            if salaried == False:
+                employee = Employees(1, "that is not an employee in this company",
+                                     "that is not an employee in this company",
+                                     "that is not an employee in this company",
+                                     "that is not an employee in this company",
+                                     "that is not an employee in this company", zipcode,
+                                     "that is not an employee in this company", pay_rate, years_employed)
+                return jsonify(employee)
+            else:
+                employee = Employees(1, first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed)
+                return jsonify(employee)
     else:
         employee = Employees(1, "You are not a general manager and may not add new employees", "You are not a general manager and may not add new employees", "You are not a general manager and may not add new employees","You are not a general manager and may not add new employees","You are not a general manager and may not add new employees",0,"You are not a general manager and may not add new employees",0,0)
         return jsonify(employee)
