@@ -595,13 +595,16 @@ def delete_job():
         delete = delete_from_job_site(location, site_name, start)
         if delete == None:
             job = Jobs(1,location,site_name,start)
-            return jsonify(job)
+            jobs = [job]
+            return jsonify([e.serialize() for e in jobs])
         else:
             job = Jobs(1, "Job does not exist", "Job does not exist", start)
-            return jsonify(job)
+            jobs = [job]
+            return jsonify([e.serialize() for e in jobs])
     else:
         job = Jobs(1, "You are not a general manager and may not add new jobs", "You are not a general manager and may not add new jobs", start)
-        return jsonify(job)
+        jobs = [job]
+        return jsonify([e.serialize() for e in jobs])
 
 @app.route("/add_job", methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -622,10 +625,12 @@ def add_job():
         insert_into_location(location)
         insert_into_job_site(location, site_name, start)
         job = Jobs(1,location,site_name,start)
-        return jsonify(job)
+        jobs = [job]
+        return jsonify([e.serialize() for e in jobs])
     else:
         job = Jobs(1, "You are not a general manager and may not add new jobs", "You are not a general manager and may not add new jobs", start)
-        return jsonify(job)
+        jobs = [job]
+        return jsonify([e.serialize() for e in jobs])
 
 @app.route("/add_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -722,10 +727,12 @@ def add_employee():
         else:
             insert_into_salaried_employee(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
         employee = Employees(1, first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed)
-        return jsonify(employee)
+        employees = [employee]
+        return jsonify([e.serialize() for e in employees])
     else:
         employee = Employees(1, "You are not a general manager and may not add new employees", "You are not a general manager and may not add new employees", "You are not a general manager and may not add new employees","You are not a general manager and may not add new employees","You are not a general manager and may not add new employees",0,"You are not a general manager and may not add new employees",0,0)
-        return jsonify(employee)
+        employees = [employee]
+        return jsonify([e.serialize() for e in employees])
 
 @app.route("/delete_employee", methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -752,10 +759,12 @@ def delete_employee():
           electrician = delete_from_electrician(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
           if electrician == False:
               employee = Employees(1, "that is not an electrician in this company","that is not an electrician in this company","that is not an electrician in this company","that is not an electrician in this company","that is not an electrician in this company",zipcode,"that is not an electrician in this company",pay_rate,years_employed)
-              return jsonify(employee)
+              employees = [employee]
+              return jsonify([e.serialize() for e in employees])
           else:
               employee = Employees(1, first_name, last_name, address, city, state, zipcode, position, pay_rate, years_employed)
-              return jsonify(employee)
+              employees = [employee]
+              return jsonify([e.serialize() for e in employees])
         else:
             salaried = delete_from_salaried_employee(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
             if salaried == False:
@@ -765,13 +774,16 @@ def delete_employee():
                                      "that is not an employee in this company",
                                      "that is not an employee in this company", zipcode,
                                      "that is not an employee in this company", pay_rate, years_employed)
-                return jsonify(employee)
+                employees = [employee]
+                return jsonify([e.serialize() for e in employees])
             else:
                 employee = Employees(1, first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed)
-                return jsonify(employee)
+                employees = [employee]
+                return jsonify([e.serialize() for e in employees])
     else:
         employee = Employees(1, "You are not a general manager and may not add new employees", "You are not a general manager and may not add new employees", "You are not a general manager and may not add new employees","You are not a general manager and may not add new employees","You are not a general manager and may not add new employees",0,"You are not a general manager and may not add new employees",0,0)
-        return jsonify(employee)
+        employees = [employee]
+        return jsonify([e.serialize() for e in employees])
 
 
 
