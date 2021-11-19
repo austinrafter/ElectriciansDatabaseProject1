@@ -3,6 +3,7 @@ import PositionAuthenticationFormThree from '../Components/AuthenticateSalariedE
 import JobForm from '../Components/Job_form';
 import Employee_Form from '../Components/Employee_Form';
 import JobFormDelete from '../Components/JobFormDelete';
+import Employee_Form_Delete from '../Components/Delete_Employee_Form';
 
 const General_Manager = () => {
 
@@ -28,6 +29,7 @@ const findEmployee = (employee) =>{
   const [showFormTwo, setShowFormTwo] = useState(false);
   const [showFormThree, setShowFormThree] = useState(false);
   const [showFormFour, setShowFormFour] = useState(false);
+  const [showFormFive, setShowFormFive] = useState(false);
 
    const toggleShowForm = () => {
     setShowForm(!showForm);
@@ -43,6 +45,10 @@ const findEmployee = (employee) =>{
 
   const toggleShowFormFour = () => {
     setShowFormFour(!showFormFour);
+  }
+
+  const toggleShowFormFive = () => {
+    setShowFormFive(!showFormFive);
   }
 
 
@@ -98,6 +104,20 @@ const findEmployee = (employee) =>{
         </button>
          {showForm && (
           <Employee_Form
+          findEmployee = {findEmployee}
+            />
+            )}
+            </div>
+    <div>
+    <button
+          onClick={toggleShowFormFive}
+          className="btn btn-primary"
+           >
+             Delete an employee
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+         {showFormFive && (
+          <Employee_Form_Delete
           findEmployee = {findEmployee}
             />
             )}

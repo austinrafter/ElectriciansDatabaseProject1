@@ -1,6 +1,6 @@
-export default class APIServiceNine{
-    static InsertEmployee(body){
-    return fetch('http://localhost:5000/add_employee',{
+export default class APIServiceTen{
+    static DeleteEmployee(body){
+    return fetch('http://localhost:5000/delete_employee',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

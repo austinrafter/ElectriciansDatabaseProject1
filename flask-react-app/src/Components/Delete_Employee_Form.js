@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import APIServiceNine from '../Components/APIServiceNine.js'
+import APIServiceTen from '../Components/APIServiceTen.js'
 import EmployeesList from '../Components/EmployeesList'
 
 
-const Employee_Form = (props) => {
+const Employee_Form_Delete = (props) => {
     const [first_name, setFirstName] = useState('')
     const [last_name, setLastName] = useState('')
     const [address, setAddress] = useState('')
@@ -24,7 +24,7 @@ const Employee_Form = (props) => {
 
 
     const insertEmployee = () =>{
-    APIServiceNine.InsertEmployee({first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed,first_name_gm,last_name_gm,address_gm,city,state_gm,zipcode_gm,position_gm})
+    APIServiceTen.DeleteEmployee({first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed,first_name_gm,last_name_gm,address_gm,city,state_gm,zipcode_gm,position_gm})
     .then((response) => setEmployees(response))
           .catch(error => console.log('error',error))
           }
@@ -219,7 +219,7 @@ const Employee_Form = (props) => {
 
                      <button
                      className="btn btn-primary mt-2"
-                     > Add Employee</button>
+                     > Delete Employee</button>
 
                    </form>
                    <EmployeesList employees = {employees} />
@@ -227,4 +227,4 @@ const Employee_Form = (props) => {
       )}
 
 
-export default Employee_Form;
+export default Employee_Form_Delete;

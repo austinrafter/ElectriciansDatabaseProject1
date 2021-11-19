@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import PositionAuthenticationFormTwo from '../Components/AuthenticateSalariedEmployeesTwo';
 import Work_Package_Form from '../Components/Work_Package_Form';
+import Work_Package_Form_Delete from '../Components/Delete_Work_Package';
 
 const Project_Manager = () => {
 
@@ -19,12 +20,16 @@ const Project_Manager = () => {
 
   const [showFormThree, setShowFormThree] = useState(false);
   const [showFormTwo, setShowFormTwo] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   const toggleShowFormThree = () => {
     setShowFormThree(!showFormThree);
   }
   const toggleShowFormTwo = () => {
     setShowFormTwo(!showFormTwo);
+  }
+  const toggleShowForm = () => {
+    setShowForm(!showForm);
   }
 
    return(
@@ -52,6 +57,20 @@ const Project_Manager = () => {
         </button>
         {showFormTwo && (
           <Work_Package_Form
+          addWorkPackage = {addWorkPackage}
+            />
+            )}
+            <hr/>
+
+   <button
+          onClick={toggleShowForm}
+          className="btn btn-primary"
+           >
+             Delete a work package from a job
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+        {showForm && (
+          <Work_Package_Form_Delete
           addWorkPackage = {addWorkPackage}
             />
             )}
