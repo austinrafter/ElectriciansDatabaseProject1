@@ -5,6 +5,7 @@ const WorkPackagesList = (props) => {
     return (
         <div className="mt-2">
         {/* Display the article details if article is not None */}
+        <h1> Work Packages </h1>
         {props.work_packages && props.work_packages.map(work_package =>{
         return (
 

@@ -356,12 +356,12 @@ def insert_into_work_package(job_site_name, work_package_name, price_of_work, ho
     conn.commit()
     return True;
 
-def delete_from_work_package(job_site_name, work_package_name, price_of_work, hours_alloted):
+def delete_from_work_package(job_site_name, work_package_name, price_of_work, hours_alloted, hours_used):
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [job_site_name])
     job_site = cursor.fetchone()
     if job_site == None:
         return False
-    cursor.execute("DELETE FROM WORK_PACKAGE WHERE JOB_SITE_ID = %s AND WORK_PACKAGE_NAME = %s AND PRICE_OF_WORK = %s AND  HOURS_ALLOTED,HOURS_USED = %s;", [job_site[0], work_package_name, price_of_work, hours_alloted,0])
+    cursor.execute("DELETE FROM WORK_PACKAGE WHERE JOB_SITE_ID = %s AND WORK_PACKAGE_NAME = %s AND PRICE_OF_WORK = %s AND  HOURS_ALLOTED = %s AND HOURS_USED = %s;", [job_site[0], work_package_name, price_of_work, hours_alloted,hours_used])
     conn.commit()
     return True
 

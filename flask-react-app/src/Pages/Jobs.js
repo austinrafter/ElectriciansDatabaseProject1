@@ -18,7 +18,7 @@ useEffect(()=>{
 
     return(
     <div>
-    <h2>Jobs</h2>
+    <h1>Jobs</h1>
         <JobsList
          jobs={jobs}
          />
