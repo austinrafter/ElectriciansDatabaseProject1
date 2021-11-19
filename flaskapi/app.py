@@ -22,8 +22,14 @@ cursor = conn.cursor()
 def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,position_name, job_to_view):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
+    if city_state_zip == None:
+        return [Foreman(1,"you are not a foreman and can't view that", "you are not a foreman and can't view that",
+                        "you are not a foreman and can't view that", "you are not a foreman and can't view that", 0)]
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
+    if person == None:
+        return [Foreman(1,"you are not a foreman and can't view that", "you are not a foreman and can't view that",
+                        "you are not a foreman and can't view that", "you are not a foreman and can't view that", 0)]
     cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
     cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = %s AND POSITION_ID=%s", [person[0], position[0]])
@@ -36,8 +42,12 @@ def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,
 def check_user_position_project_manager(first_name,last_name,Address,city,state,zipcode,position_name, job_to_view):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
+    if city_state_zip == None:
+        return [ProjectManager(1, "you are not a project manager and can't view that", 0, 0, 0, 0, 0, 0)]
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
+    if person == None:
+        return [ProjectManager(1, "you are not a project manager and can't view that", 0, 0, 0, 0, 0, 0)]
     cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
     cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = %s AND POSITION_ID= %s", [person[0], position[0]])
@@ -45,13 +55,17 @@ def check_user_position_project_manager(first_name,last_name,Address,city,state,
     if check_position[0] == position[0]:
         return get_project_manager_view(job_to_view)
     else:
-        return [ProjectManager("you are not a project manager and can't view that",0,0,0,0,0,0)]
+        return [ProjectManager(1,"you are not a project manager and can't view that",0,0,0,0,0,0)]
 
 def check_user_position_general_manager(first_name,last_name,Address,city,state,zipcode,position_name):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
+    if city_state_zip == None:
+        return [GeneralManager(1, 0, 0, 0, 0)]
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
+    if person == None:
+        return [GeneralManager(1, 0, 0, 0, 0)]
     cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
     cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID = %s AND POSITION_ID=%s", [person[0], position[0]])
@@ -59,7 +73,7 @@ def check_user_position_general_manager(first_name,last_name,Address,city,state,
     if check_position[0] == position[0]:
         return get_general_manager_view()
     else:
-        return [GeneralManager(0,0,0,0)]
+        return [GeneralManager(1,0,0,0,0)]
 
 def position_check_fm(first_name,last_name,Address,city,state,zipcode,position_name):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
