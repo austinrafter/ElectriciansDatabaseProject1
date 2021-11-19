@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import APIServiceTwo from '../Components/ApiServiceTwo.js'
+import WorkPackagesList from '../Components/Work_Packages_List';
 
 
 const Work_Package_Form = (props) => {
@@ -17,11 +18,11 @@ const Work_Package_Form = (props) => {
     const [pay_rate, setPayRate] = useState('')
     const [years_employed, setYearsEmployed] = useState('')
     const [job, setJob] = useState('')
-    const [work_package, setWorkPackage] = useState('')
+    const [work_packages, setWorkPackages] = useState('')
 
     const insertWorkPackage = () =>{
     APIServiceTwo.InsertWorkPackage({work_package_name, price_of_work, hours_alloted, hours_used, first_name,last_name, address, city, state, zipcode,position, pay_rate, years_employed, job})
-    .then((response) => setWorkPackage(response))
+    .then((response) => setWorkPackages(response))
           .catch(error => console.log('error',error))
           }
 
@@ -197,6 +198,9 @@ const Work_Package_Form = (props) => {
                      Add Work Package</button>
 
                    </form>
+                   <div>
+        <WorkPackagesList work_packages={work_packages}/>
+        </div>
            </div>
       )}
 
