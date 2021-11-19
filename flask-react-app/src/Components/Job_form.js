@@ -64,7 +64,7 @@ const JobForm = (props) => {
                       <input
                       type="text"
                       className="form-control"
-                      placeholder ="Enter job start date"
+                      placeholder ="yyyy-mm-dd"
                       value={start_date}
                       onChange={(e)=>setStartDate(e.target.value)}
                       required

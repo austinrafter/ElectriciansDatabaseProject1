@@ -350,8 +350,11 @@ def delete_from_job_site(location_name, site_name, start_date):
 def insert_into_work_package(job_site_name, work_package_name, price_of_work, hours_alloted, hours_used):
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [job_site_name])
     job_site = cursor.fetchone()
+    if job_site == None:
+        return False;
     cursor.execute("INSERT INTO WORK_PACKAGE (JOB_SITE_ID ,WORK_PACKAGE_NAME ,PRICE_OF_WORK, HOURS_ALLOTED,HOURS_USED) VALUES (%s,%s,%s,%s,%s);", [job_site[0], work_package_name, price_of_work, hours_alloted,hours_used])
     conn.commit()
+    return True;
 
 def delete_from_work_package(job_site_name, work_package_name, price_of_work, hours_alloted):
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [job_site_name])
@@ -645,12 +648,17 @@ def add_work_package():
     elif position == 'Foreman':
         upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
     if upper_management:
-        insert_into_work_package(job, work_package_name, price_of_work, hours_alloted, hours_used)
-        work_package = WorkPackages(1,job,work_package_name,price_of_work,hours_alloted,hours_used)
-        return jsonify(work_package)
+        work_p = insert_into_work_package(job, work_package_name, price_of_work, hours_alloted, hours_used)
+        if work_p == False:
+            work_package = WorkPackages(1, "that is not a job to add to", "that is not a job to add to", 1, 1, 1)
+        else:
+            work_package = WorkPackages(1,job,work_package_name,price_of_work,hours_alloted,hours_used)
+        work_packages = [work_package]
+        return jsonify([e.serialize() for e in work_packages])
     else:
         work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", price_of_work, hours_alloted, hours_used)
-        return jsonify(work_package)
+        work_packages = [work_package]
+        return jsonify([e.serialize() for e in work_packages])
 
 @app.route("/delete_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -676,13 +684,16 @@ def delete_work_package():
         work = delete_from_work_package(job, work_package_name, price_of_work, hours_alloted, hours_used)
         if work == False:
             work_package = WorkPackages(1,"that is not a work package for this job","that is not a work package for this job",price_of_work,hours_alloted,hours_used)
-            return jsonify(work_package)
+            work_packages = [work_package]
+            return jsonify([e.serialize() for e in work_packages])
         else:
             work_package = WorkPackages(1,job,work_package_name,price_of_work,hours_alloted,hours_used)
-            return jsonify(work_package)
+            work_packages = [work_package]
+            return jsonify([e.serialize() for e in work_packages])
     else:
         work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", price_of_work, hours_alloted, hours_used)
-        return jsonify(work_package)
+        work_packages = [work_package]
+        return jsonify([e.serialize() for e in work_packages])
 
 
 @app.route("/add_employee", methods=["POST"], strict_slashes=False)
