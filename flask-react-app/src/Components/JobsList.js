@@ -35,7 +35,9 @@ const checkPosition = () =>{
     return (
         <div className="mt-2">
         <h3> "Double click the button under a job to see the work packages for that job" </h3>
+
         {/* Display the job details if job is not None */}
+
         {props.jobs && props.jobs.map(job =>{
         
         return (
@@ -49,14 +51,15 @@ const checkPosition = () =>{
         <Button className="text-primary" onClick = {handleSubmit} value = {job.site}> { "work packages"  } </Button>
         <hr/>
         <hr/>
-        <div>
-        <WorkPackagesList work_packages={work_packages}/>
-        </div>
+
 
         </div>
     )
 
         })}
+      <div>
+        <WorkPackagesList work_packages={work_packages}/>
+        </div>
     </div>
     )
 }
