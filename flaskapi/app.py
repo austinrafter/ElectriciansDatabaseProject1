@@ -1,5 +1,5 @@
 from flask import request
-from flask import Flask, jsonify, session
+from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
