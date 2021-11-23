@@ -3,7 +3,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
-from models import Jobs, WorkPackages, Employees, Foreman, ProjectManager, GeneralManager
+from models import Jobs, WorkPackages, Employees, Foreman, ProjectManager, GeneralManager, Inventory
 from datetime import datetime
 
 
@@ -218,15 +218,90 @@ def change_hours_used_on_work_package():
     else:
         return False
 
-def change_material_amount_used_in_work_package(work_package_name, job_site_name, inventory_name, amount_used):
+@app.route("/material_amount_used" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def change_material_amount_used_in_work_package():
+    work_package_name = request.json['work_package_name']
+    job_site_name = request.json['job_site_name']
+    inventory_name = request.json['inventory_name']
+    amount_used = request.json['amount_used']
     cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [job_site_name])
     job_site = cursor.fetchone()
-    cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [work_package_name,job_site])
+    cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = %s AND JOB_SITE_ID = %s", [work_package_name,job_site[0]])
     work_package = cursor.fetchone()
-    cursor.execute("SELECT INVENTORY_ID FROM INVENTORY WHERE MATERIAL_NAME = ?", [inventory_name])
+    cursor.execute("SELECT INVENTORY_ID FROM INVENTORY WHERE MATERIAL_NAME = %s", [inventory_name])
     inventory = cursor.fetchone()
-    cursor.execute("UPDATE MATERIAL_IN_WORK_PACKAGE SET AMOUNT_USED =? WHERE INVENTORY_ID = ? AND WORK_PACKAGE_ID = ?", [amount_used, inventory[0],work_package[0]])
+    cursor.execute("UPDATE MATERIAL_IN_WORK_PACKAGE SET AMOUNT_USED =%s WHERE INVENTORY_ID = %s AND WORK_PACKAGE_ID = %s", [amount_used, inventory[0],work_package[0]])
     conn.commit()
+
+@app.route("/add_inventory" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def add_inventory():
+    material_name = request.json['material_name']
+    cost_per_unit = request.json['cost_per_unit']
+    weight_per_unit = request.json['weight_per_unit']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+    years_employed = request.json['years_employed']
+    if position == 'Project Manager':
+        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
+    elif position == 'Foreman':
+        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
+    if upper_management:
+        cursor.execute("INSERT INTO INVENTORY (MATERIAL_NAME,COST_PER_UNIT,WEIGHT_PER_UNIT) VALUES (%s,%s,%s);",
+                       [material_name, cost_per_unit, weight_per_unit])
+        conn.commit()
+        inventory = Inventory(1,material_name, cost_per_unit, weight_per_unit)
+        inventorys = [inventory]
+
+        return jsonify([e.serialize() for e in inventorys])
+    else:
+        inventory = Inventory(1, "You can't add inventory", 0, 0)
+        inventorys = [inventory]
+        return jsonify([e.serialize() for e in inventorys])
+
+@app.route("/delete_inventory" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def delete_from_inventory(material_name, cost_per_unit, weight_per_unit):
+    material_name = request.json['material_name']
+    cost_per_unit = request.json['cost_per_unit']
+    weight_per_unit = request.json['weight_per_unit']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+    years_employed = request.json['years_employed']
+    if position == 'Project Manager':
+        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
+    elif position == 'Foreman':
+        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
+    if upper_management:
+        cursor.execute("SELECT MATERIAL_NAME FROM INVENTORY WHERE MATERIAL_NAME = %s", [material_name])
+        material = cursor.fetchone()
+        if material[0] == None:
+            inventory = Inventory(1, "That inventory is not in our system to delete", 0, 0)
+            inventorys = [inventory]
+        else:
+            cursor.execute("DELETE FROM INVENTORY WHERE MATERIAL_NAME = %s AND COST_PER_UNIT = ? AND WEIGHT_PER_UNIT = ?;",
+                       [material_name, cost_per_unit, weight_per_unit])
+            conn.commit()
+            inventory = Inventory(1, material_name, cost_per_unit, weight_per_unit)
+            inventorys = [inventory]
+
+        return jsonify([e.serialize() for e in inventorys])
+    else:
+        inventory = Inventory(1, "You can't delete inventory", 0, 0)
+        inventorys = [inventory]
+        return jsonify([e.serialize() for e in inventorys])
+
 
 def get_foreman_view(job_site_name):
     cursor.execute("SELECT * FROM FOREMAN WHERE SITE_NAME=%s", [job_site_name])
@@ -301,18 +376,6 @@ def delete_from_person(first_name,last_name,Address,city,state,zipcode):
     city_state_zip = cursor.fetchone()
     cursor.execute("DELETE FROM PERSON WHERE FIRST_NAME = ? AND LAST_NAME = ? AND ADDRESS = ? AND CITY_STATE_ZIP_ID = ?;", [first_name,last_name, Address, city_state_zip[0]])
     conn.commit()
-
-
-
-def insert_into_inventory(material_name, cost_per_unit, weight_per_unit):
-    cursor.execute("INSERT INTO INVENTORY (MATERIAL_NAME,COST_PER_UNIT,WEIGHT_PER_UNIT) VALUES (?,?,?);", [material_name, cost_per_unit, weight_per_unit])
-    conn.commit()
-
-def delete_from_inventory(material_name, cost_per_unit, weight_per_unit):
-    cursor.execute("DELETE FROM INVENTORY WHERE MATERIAL_NAME = ? AND COST_PER_UNIT = ? AND WEIGHT_PER_UNIT = ?;", [material_name, cost_per_unit, weight_per_unit])
-    conn.commit()
-
-
 
 def insert_into_position(position):
     cursor.execute(" SELECT POSITION_ID FROM  EMPLOYEE_POSITION WHERE POSITION_NAME = %s;", [position])

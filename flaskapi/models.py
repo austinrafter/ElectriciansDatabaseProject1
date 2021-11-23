@@ -167,6 +167,29 @@ class GeneralManager():
 
         }
 
+class Inventory():
+    inventory_id = 0
+    material_name = ''
+    cost_per_unit = 0.0
+    weight_per_unit = 0.0
+
+
+    def __init__(self, inventory_id, material_name, cost_per_unit, weight_per_unit):
+        self.inventory_id = inventory_id
+        self.material_name = material_name
+        self.cost_per_unit = cost_per_unit
+        self.weight_per_unit = weight_per_unit
+
+
+    def serialize(self):
+        return {
+            'inventory_id': self.inventory_id,
+            'material_name': self.material_name,
+            'cost_per_unit': self.cost_per_unit,
+            'weight_per_unit': self.weight_per_unit,
+
+        }
+
 
 
 
