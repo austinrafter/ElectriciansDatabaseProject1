@@ -3,6 +3,11 @@ import PositionAuthenticationForm from '../Components/Authenticate_Salaried_Empl
 import Work_Package_Form from '../Components/Work_Package_Form';
 import Work_Package_Form_Delete from '../Components/Delete_Work_Package';
 import AddInventory from '../Components/AddInventory';
+import DeleteInventory from '../Components/DeleteInventory';
+import AddElectricianOnWorkPackage from '../Components/AddElectricianOnWorkPackage';
+import DeleteElectricianOffWorkPackage from '../Components/DeleteElectricianOffWorkPackage';
+import AddMaterialToWorkPackage from '../Components/AddMaterialToWorkPackage';
+import DeleteMaterialOffWorkPackage from '../Components/DeleteMaterialOffWorkPackage';
 
 const Foreman = () => {
 
@@ -20,9 +25,21 @@ const addInventory = (inventory) =>{
     setWorkPackages(new_inventory)
   }
 
+const addElectricianOnWorkPackage = (electrician_on_work_package) =>{
+    const new_electricianOnWorkPackage = [...electricians_on_work_packages,electrician_on_work_package]
+    setElectricansOnWorkPackages(new_electricianOnWorkPackage)
+  }
+
+ const addMaterialToWorkPackage = (material_on_work_package) =>{
+    const new_materialInWorkPackages = [...materials_on_work_packages,material_on_work_package]
+    setMaterialsInWorkPackages(new_materialInWorkPackages)
+  }
+
  const [foremen, setForemen] = useState([]);
  const [work_packages, setWorkPackages] = useState([]);
  const [inventorys, setInventorys] = useState([]);
+ const [electricians_on_work_packages, setElectricansOnWorkPackages]= useState([]);
+ const [materials_on_work_packages, setMaterialsInWorkPackages] = useState([]);
 
 
   const [showForm, setShowForm] = useState(false);
@@ -118,12 +135,83 @@ const addInventory = (inventory) =>{
           onClick={toggleShowFormFour}
           className="btn btn-primary"
            >
-             Add inventory
+             Add inventory to system
+
         <i className="bi bi-pencil-square m-2"></i>
         </button>
         {showFormFour && (
           <AddInventory
           addInventory = {addInventory}
+            />
+            )}
+            <hr/>
+
+      <button
+          onClick={toggleShowFormFive}
+          className="btn btn-primary"
+           >
+             Delete inventory from system
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+        {showFormFive && (
+          <DeleteInventory
+          addInventory = {addInventory}
+            />
+            )}
+            <hr/>
+
+      <button
+          onClick={toggleShowFormSix}
+          className="btn btn-primary"
+           >
+             Add electrician to work package
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+        {showFormSix && (
+          <AddElectricianOnWorkPackage
+          addElectricianOnWorkPackage = {addElectricianOnWorkPackage}
+            />
+            )}
+            <hr/>
+
+      <button
+          onClick={toggleShowFormSeven}
+          className="btn btn-primary"
+           >
+             Delete electrician from work package
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+        {showFormSeven && (
+          <DeleteElectricianOffWorkPackage
+          addElectricianOnWorkPackage = {addElectricianOnWorkPackage}
+            />
+            )}
+            <hr/>
+
+      <button
+          onClick={toggleShowFormEight}
+          className="btn btn-primary"
+           >
+             Add material to work package
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+        {showFormEight && (
+          <AddMaterialToWorkPackage
+          addMaterialToWorkPackage = {addMaterialToWorkPackage}
+            />
+            )}
+            <hr/>
+
+      <button
+          onClick={toggleShowFormNine}
+          className="btn btn-primary"
+           >
+             Delete material from work package
+        <i className="bi bi-pencil-square m-2"></i>
+        </button>
+        {showFormNine && (
+          <DeleteMaterialOffWorkPackage
+          addMaterialToWorkPackage = {addMaterialToWorkPackage}
             />
             )}
             <hr/>
