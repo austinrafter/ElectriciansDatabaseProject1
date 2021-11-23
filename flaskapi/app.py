@@ -3,7 +3,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
-from models import Jobs, WorkPackages, Employees, Foreman, ProjectManager, GeneralManager, Inventory
+from models import Jobs, WorkPackages, Employees, Foreman, ProjectManager, GeneralManager, Inventory, MaterialInWorkPackage, ElectricianOnWorkPackage
 from datetime import datetime
 
 
@@ -497,59 +497,293 @@ def delete_from_salaried_employee(first_name,last_name,Address,city,state,zipcod
     return True
 
 
+@app.route("/add_electrician_to_work_package" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def add_electrician_to_work_package():
+    electricians_first_name = request.json['electricians_first_name']
+    electricians_last_name = request.json['electricians_last_name']
+    electricians_position = request.json['electricians_position']
+    electricians_address = request.json['electricians_address']
+    work_package_name = request.json['work_package_name']
+    site_name = request.json['site_name']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+    if position == 'Project Manager':
+        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
+    elif position == 'Foreman':
+        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
+    if upper_management:
+        insert_into_position(electricians_position)
+        cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [electricians_position])
+        position = cursor.fetchone()
+        if position == None:
+            inventory = ElectricianOnWorkPackage(1, "This position is not in our system",
+                                                 "This position is not in our system",
+                                                 "This position is not in our system",
+                                                 "This position is not in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s", [electricians_first_name,electricians_last_name,electricians_address])
+        person = cursor.fetchone()
+        if person[0] == None:
+            inventory = ElectricianOnWorkPackage(1, "This person is not in our system",
+                                                 "This person is not in our system",
+                                                 "This person is not in our system",
+                                                "This person is not in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN WHERE PERSON_ID = %s AND POSITION_ID = %s", [person[0],position[0]])
+        electrician = cursor.fetchone()
+        if electrician == None:
+            inventory = ElectricianOnWorkPackage(1, "This electrician is not in our system",
+                                                 "This electrician is not in our system",
+                                                 "This electrician is not in our system",
+                                                 "This electrician is not in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [site_name])
+        job_site = cursor.fetchone()
+        if job_site == None:
+            inventory = ElectricianOnWorkPackage(1, "This job is not in our system",
+                                                 "This job is not in our system",
+                                                 "This job is not in our system",
+                                                 "This job is not in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [work_package_name,job_site[0]])
+        work_package = cursor.fetchone()
+        if work_package == None:
+            inventory = ElectricianOnWorkPackage(1, "This work package is not in our system",
+                                                 "This work package is not in our system",
+                                                 "This work package is not in our system",
+                                                 "This work package is not in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("INSERT INTO ELECTRICIAN_ON_WORK_PACKAGE(ELECTRICIAN_ID,WORK_PACKAGE_ID) VALUES (?,?);", [electrician[0],work_package[0]])
+        conn.commit()
+        inventory = ElectricianOnWorkPackage(1, electricians_first_name,
+                                             electricians_last_name,
+                                             work_package_name,
+                                             site_name)
+        inventorys = [inventory]
+        return jsonify([e.serialize() for e in inventorys])
+    else:
+        inventory = ElectricianOnWorkPackage(1, "You can't add electricians to work packages","You can't add material to work packages","You can't add material to work packages","You can't add material to work packages")
+        inventorys = [inventory]
+        return jsonify([e.serialize() for e in inventorys])
 
-def insert_into_electrician_on_work_package(first_name,last_name,position_name,address, work_package_name, job_site_name):
-    insert_into_position(position_name)
-    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
-    position = cursor.fetchone()
-    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? ", [first_name,last_name,address])
-    person = cursor.fetchone()
-    if person[0] == None:
-        return "This person is not in our system"
-    cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN WHERE PERSON_ID = ? AND POSITION_ID = ?", [person[0],position[0]])
-    electrician = cursor.fetchone()
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [job_site_name])
-    job_site = cursor.fetchone()
-    cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [work_package_name,job_site[0]])
-    work_package = cursor.fetchone()
-    cursor.execute("INSERT INTO ELECTRICIAN_ON_WORK_PACKAGE(ELECTRICIAN_ID,WORK_PACKAGE_ID) VALUES (?,?);", [electrician[0],work_package[0]])
-    conn.commit()
+@app.route("/delete_electrician_from_work_package" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def delete_electrician_from_work_package():
+    electricians_first_name = request.json['electricians_first_name']
+    electricians_last_name = request.json['electricians_last_name']
+    electricians_position = request.json['electricians_position']
+    electricians_address = request.json['electricians_address']
+    work_package_name = request.json['work_package_name']
+    site_name = request.json['site_name']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+    if position == 'Project Manager':
+        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
+    elif position == 'Foreman':
+        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
+    if upper_management:
+        insert_into_position(electricians_position)
+        cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [electricians_position])
+        position = cursor.fetchone()
+        if position == None:
+            inventory = ElectricianOnWorkPackage(1, "This position is not in our system",
+                                                 "This position is not in our system",
+                                                 "This position is not in our system",
+                                                 "This position is not in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s",
+                       [electricians_first_name, electricians_last_name, electricians_address])
+        person = cursor.fetchone()
+        if person[0] == None:
+            inventory = ElectricianOnWorkPackage(1, "This person is not in our system",
+                                                 "This person is not in our system",
+                                                 "This person is not in our system",
+                                                 "This person is not in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN WHERE PERSON_ID = %s AND POSITION_ID = %s",
+                       [person[0], position[0]])
+        electrician = cursor.fetchone()
+        if electrician == None:
+            inventory = ElectricianOnWorkPackage(1, "This electrician is not in our system",
+                                                 "This electrician is not in our system",
+                                                 "This electrician is not in our system",
+                                                 "This electrician is not in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [site_name])
+        job_site = cursor.fetchone()
+        if job_site == None:
+            inventory = ElectricianOnWorkPackage(1, "This job is not in our system",
+                                                 "This job is not in our system",
+                                                 "This job is not in our system",
+                                                 "This job is not in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?",
+                       [work_package_name, job_site[0]])
+        work_package = cursor.fetchone()
+        if work_package == None:
+            inventory = ElectricianOnWorkPackage(1, "This work package is not in our system",
+                                                 "This work package is not in our system",
+                                                 "This work package is not in our system",
+                                                 "This work package is not in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("DELETE FROM ELECTRICIAN_ON_WORK_PACKAGE WHERE ELECTRICIAN_ID = ? AND WORK_PACKAGE_ID = ?;",
+                       [electrician[0], work_package[0]])
+        conn.commit()
+        inventory = ElectricianOnWorkPackage(1, electricians_first_name,
+                                             electricians_last_name,
+                                             work_package_name,
+                                             site_name)
+        inventorys = [inventory]
+        return jsonify([e.serialize() for e in inventorys])
+    else:
+        inventory = ElectricianOnWorkPackage(1, "You can't add electricians to work packages",
+                                             "You can't add material to work packages",
+                                             "You can't add material to work packages",
+                                             "You can't add material to work packages")
+        inventorys = [inventory]
+        return jsonify([e.serialize() for e in inventorys])
 
-def delete_from_electrician_on_work_package(first_name,last_name,position_name,address, work_package_name, job_site_name):
-    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
-    position = cursor.fetchone()
-    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? ", [first_name,last_name,address])
-    person = cursor.fetchone()
-    cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN WHERE PERSON_ID = ? AND POSITION_ID = ?", [person,position[0]])
-    electrician = cursor.fetchone()
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [job_site_name])
-    job_site = cursor.fetchone()
-    cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [work_package_name,job_site[0]])
-    work_package = cursor.fetchone()
-    cursor.execute("DELETE FROM ELECTRICIAN_ON_WORK_PACKAGE WHERE ELECTRICIAN_ID = ? AND WORK_PACKAGE_ID = ?;", [electrician[0],work_package[0]])
-    conn.commit()
 
 
+@app.route("/insert_material_in_work_package" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def insert_material_in_work_package():
+    material_name = request.json['material_name']
+    work_package_name = request.json['work_package_name']
+    site_name = request.json['site_name']
+    amount_alloted = request.json['amount_alloted']
+    amount_used = request.json['amount_used']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+    if position == 'Project Manager':
+        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
+    elif position == 'Foreman':
+        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
+    if upper_management:
+        cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [site_name])
+        job_site = cursor.fetchone()
+        if job_site == None:
+            inventory = MaterialInWorkPackage(1, "That job site does not exist", 0, 0,
+                                              "That job site does not exist",
+                                              "That job site does not exist")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = %s AND JOB_SITE_ID = %s",
+                       [work_package_name, job_site])
+        work_package = cursor.fetchone()
+        if work_package == None:
+            inventory = MaterialInWorkPackage(1, "That work package does not exist", 0, 0,
+                                              "That work package does not exist",
+                                              "That work package does not exist")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT INVENTORY_ID FROM INVENTORY WHERE MATERIAL_NAME = %s", [material_name])
+        inventory = cursor.fetchone()
+        if inventory == None:
+            inventory = MaterialInWorkPackage(1, "That item does not exist in our system", 0, 0,
+                                              "That item does not exist in our system",
+                                              "That item does not exist in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute(
+            "INSERT INTO MATERIAL_IN_WORK_PACKAGE(WORK_PACKAGE_ID,INVENTORY_ID,AMOUNT_ALLOTED,AMOUNT_USED) VALUES (?, ?, ?, ?);",
+            [inventory[0], work_package[0], amount_alloted, amount_used])
+        conn.commit()
+        inventory = MaterialInWorkPackage(1,material_name, amount_alloted, amount_used, work_package_name, site_name)
+        inventorys = [inventory]
 
-def insert_into_material_in_work_package(inventory_name, work_package_name, job_site_name, material_amount_issued,material_amount_used):
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [job_site_name])
-    job_site = cursor.fetchone()
-    cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [work_package_name,job_site])
-    work_package = cursor.fetchone()
-    cursor.execute("SELECT INVENTORY_ID FROM INVENTORY WHERE MATERIAL_NAME = ?", [inventory_name])
-    inventory = cursor.fetchone()
-    cursor.execute("INSERT INTO MATERIAL_IN_WORK_PACKAGE(WORK_PACKAGE_ID,INVENTORY_ID,AMOUNT_ALLOTED,AMOUNT_USED) VALUES (?, ?, ?, ?);", [inventory[0], work_package[0], material_amount_issued, material_amount_used])
-    conn.commit()
+        return jsonify([e.serialize() for e in inventorys])
+    else:
+        inventory = MaterialInWorkPackage(1, "You can't add material to work packages", 0, 0,"You can't add material to work packages","You can't add material to work packages")
+        inventorys = [inventory]
+        return jsonify([e.serialize() for e in inventorys])
 
-def delete_from_material_in_work_package(inventory_name, work_package_name, job_site_name, material_amount_issued,material_amount_used):
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [job_site_name])
-    job_site = cursor.fetchone()
-    cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [work_package_name,job_site])
-    work_package = cursor.fetchone()
-    cursor.execute("SELECT INVENTORY_ID FROM INVENTORY WHERE MATERIAL_NAME = ?", [inventory_name])
-    inventory = cursor.fetchone()
-    cursor.execute("DELETE FROM MATERIAL_IN_WORK_PACKAGE WHERE WORK_PACKAGE_ID = ? AND INVENTORY_ID = ? AND AMOUNT_ALLOTED = ? AND AMOUNT_USED = ?;", [inventory[0], work_package[0], material_amount_issued, material_amount_used])
-    conn.commit()
+@app.route("/delete_material_in_work_package" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def delete_material_in_work_package(inventory_name, work_package_name, job_site_name, material_amount_issued,material_amount_used):
+    material_name = request.json['material_name']
+    work_package_name = request.json['work_package_name']
+    site_name = request.json['site_name']
+    amount_alloted = request.json['amount_alloted']
+    amount_used = request.json['amount_used']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position = request.json['position']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+    if position == 'Project Manager':
+        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
+    elif position == 'Foreman':
+        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
+    if upper_management:
+        cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [site_name])
+        job_site = cursor.fetchone()
+        if job_site == None:
+            inventory = MaterialInWorkPackage(1, "That job site does not exist", 0, 0,
+                                              "That job site does not exist",
+                                              "That job site does not exist")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = %s AND JOB_SITE_ID = %s",
+                       [work_package_name, job_site])
+        work_package = cursor.fetchone()
+        if work_package == None:
+            inventory = MaterialInWorkPackage(1, "That work package does not exist", 0, 0,
+                                              "That work package does not exist",
+                                              "That work package does not exist")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute("SELECT INVENTORY_ID FROM INVENTORY WHERE MATERIAL_NAME = %s", [material_name])
+        inventory = cursor.fetchone()
+        if inventory == None:
+            inventory = MaterialInWorkPackage(1, "That item does not exist in our system", 0, 0,
+                                              "That item does not exist in our system",
+                                              "That item does not exist in our system")
+            inventorys = [inventory]
+            return jsonify([e.serialize() for e in inventorys])
+        cursor.execute(
+            "DELETE FROM MATERIAL_IN_WORK_PACKAGE WHERE WORK_PACKAGE_ID = ? AND INVENTORY_ID = ? AND AMOUNT_ALLOTED = ? AND AMOUNT_USED = ?;",
+            [inventory[0], work_package[0], amount_alloted, amount_used])
+        conn.commit()
+        inventory = MaterialInWorkPackage(1, material_name, amount_alloted, amount_used, work_package_name, site_name)
+        inventorys = [inventory]
+
+        return jsonify([e.serialize() for e in inventorys])
+    else:
+        inventory = MaterialInWorkPackage(1, "You can't add material to work packages", 0, 0,
+                                          "You can't add material to work packages",
+                                          "You can't add material to work packages")
+        inventorys = [inventory]
+        return jsonify([e.serialize() for e in inventorys])
+
 
 @app.route("/")
 @cross_origin()

@@ -4,9 +4,9 @@ import InventoryList from '../Components/InventoryList';
 
 
 const AddInventory = (props) => {
-    const insertedJob = (job) =>{
-        const new_jobs = [...jobs,job]
-        setJobs(new_jobs)
+    const insertedInventory = (inventory) =>{
+        const new_inventory = [...inventorys,inventory]
+        setInventorys(new_inventory)
     }
 
     const [material_name, setMaterialName] = useState('')
@@ -26,7 +26,7 @@ const AddInventory = (props) => {
     const [inventorys, setInventorys] = useState([]);
 
     const checkInventory = () =>{
-    APIServiceSeven.InsertEmployee({material_name,cost_per_unit,weight_per_unit ,first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
+    APIServiceTwelve.InsertEmployee({material_name,cost_per_unit,weight_per_unit ,first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
     .then((response) => setInventorys(response))
           .catch(error => console.log('error',error))
           }
@@ -195,15 +195,15 @@ const AddInventory = (props) => {
                      <button
                      className="btn btn-primary mt-2"
                      >
-                     Check Position</button>
+                     Add inventory</button>
 
                    </form>
 
                 <div>
-        <InventoryList inventorys={inventorys}/>
-        </div>
+            <InventoryList inventorys={inventorys}/>
+            </div>
            </div>
       )}
 
 
-export default PositionAuthenticationFormThree;
+export default AddInventory;

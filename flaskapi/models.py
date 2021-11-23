@@ -190,6 +190,84 @@ class Inventory():
 
         }
 
+class Inventory():
+    inventory_id = 0
+    material_name = ''
+    cost_per_unit = 0.0
+    weight_per_unit = 0.0
+
+
+    def __init__(self, inventory_id, material_name, cost_per_unit, weight_per_unit):
+        self.inventory_id = inventory_id
+        self.material_name = material_name
+        self.cost_per_unit = cost_per_unit
+        self.weight_per_unit = weight_per_unit
+
+
+    def serialize(self):
+        return {
+            'inventory_id': self.inventory_id,
+            'material_name': self.material_name,
+            'cost_per_unit': self.cost_per_unit,
+            'weight_per_unit': self.weight_per_unit,
+
+        }
+
+class MaterialInWorkPackage():
+    material_in_work_package_id = 0
+    material_name = ''
+    amount_alloted = 0
+    amount_used = 0
+    work_package_name = ''
+    site_name = ''
+
+
+    def __init__(self, material_in_work_package_id, material_name, amount_alloted, amount_used, work_package_name, site_name):
+        self.material_in_work_package_id = material_in_work_package_id
+        self.material_name = material_name
+        self.amount_alloted = amount_alloted
+        self.amount_used = amount_used
+        self.work_package_name = work_package_name
+        self.site_name = site_name
+
+
+    def serialize(self):
+        return {
+            'material_in_work_package_id': self.material_in_work_package_id,
+            'material_name': self.material_name,
+            'amount_alloted': self.amount_alloted,
+            'amount_used': self.amount_used,
+            "work_package_name": self.work_package_name,
+            "site_name": self.site_name,
+
+        }
+
+class ElectricianOnWorkPackage():
+    electrician_on_work_package_id = 0
+    first_name = ''
+    last_name = ''
+    work_package_name = ''
+    site_name = ''
+
+
+    def __init__(self, electrician_on_work_package_id, first_name, last_name, work_package_name, site_name):
+        self.electrician_on_work_package_id = electrician_on_work_package_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.work_package_name = work_package_name
+        self.site_name = site_name
+
+
+    def serialize(self):
+        return {
+            'electrician_on_work_package_id': self.electrician_on_work_package_id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            "work_package_name": self.work_package_name,
+            "site_name": self.site_name,
+
+        }
+
 
 
 
