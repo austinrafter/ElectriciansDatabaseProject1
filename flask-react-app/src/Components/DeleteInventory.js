@@ -57,7 +57,7 @@ const DeleteInventory = (props) => {
 
       return (
            <div>
-           <h2> Enter your information to see the right info about jobs </h2>
+           <h2> "Enter information about the inventory item to delete" </h2>
              <form onSubmit = {handleSubmit} >
 
                      <label htmlFor="material_name" className="form-label">First Name</label>

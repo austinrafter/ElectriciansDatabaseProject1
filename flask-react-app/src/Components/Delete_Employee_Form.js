@@ -54,6 +54,7 @@ const Employee_Form_Delete = (props) => {
       return (
            <div>
              <form onSubmit = {handleSubmit} >
+                    <h2> "Enter information about the employee to delete" </h2>
 
                      <label htmlFor="first_name" className="form-label">Employee First Name</label>
                       <input

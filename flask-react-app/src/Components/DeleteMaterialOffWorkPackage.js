@@ -59,7 +59,7 @@ const DeleteMaterialOffWorkPackage = (props) => {
 
       return (
            <div>
-           <h2> Enter the information about the material on the job </h2>
+           <h2> "Enter the information about the material to delete on the job" </h2>
              <form onSubmit = {handleSubmit} >
 
                      <label htmlFor="material_name" className="form-label">First Name</label>

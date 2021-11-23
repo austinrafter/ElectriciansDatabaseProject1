@@ -40,7 +40,7 @@ const JobFormDelete = (props) => {
       return (
            <div>
              <form onSubmit = {handleSubmit} >
-
+                    <h2>"Enter information about the job to delete" </h2>
                      <label htmlFor="job_name" className="form-label">Job Name</label>
                      <input
                      type="text"

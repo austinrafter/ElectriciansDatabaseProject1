@@ -39,7 +39,7 @@ const JobForm = (props) => {
       return (
            <div>
              <form onSubmit = {handleSubmit} >
-
+                    <h2>"Enter information about the job to add" </h2>
                      <label htmlFor="job_name" className="form-label">Job Name</label>
                      <input
                      type="text"

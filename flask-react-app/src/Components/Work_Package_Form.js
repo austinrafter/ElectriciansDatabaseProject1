@@ -49,7 +49,7 @@ const Work_Package_Form = (props) => {
       return (
            <div>
              <form onSubmit = {handleSubmit} >
-
+                    <h2> "Enter information about the work package to add" </h2>
                      <label htmlFor="work_package_name" className="form-label">Work Package Name</label>
                      <input
                      type="text"

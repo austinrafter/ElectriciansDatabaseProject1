@@ -54,7 +54,7 @@ const Employee_Form = (props) => {
       return (
            <div>
              <form onSubmit = {handleSubmit} >
-
+                    <h2>"Enter information about the employee to add" </h2>
                      <label htmlFor="first_name" className="form-label">Employee First Name</label>
                       <input
                       type="text"

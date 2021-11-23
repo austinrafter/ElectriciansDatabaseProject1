@@ -62,7 +62,7 @@ const AddElectricianOnWorkPackage = (props) => {
 
       return (
            <div>
-           <h2> Enter your information to see the right info about jobs </h2>
+           <h2> Enter information about the electrician and work package </h2>
              <form onSubmit = {handleSubmit} >
 
                      <label htmlFor="electricians_first_name" className="form-label">First Name</label>
