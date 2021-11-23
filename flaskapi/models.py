@@ -141,12 +141,15 @@ class ProjectManager():
 
 class GeneralManager():
     general_manager_id = 0
+    site_name = ''
     cost_of_project = 0.0
     amount_made = 0.0
     total_profits = 0.0
     number_of_days_on_project = 0.0
 
-    def __init__(self, general_manager_id, cost_of_project, amount_made, total_profits, number_of_days_on_project):
+
+    def __init__(self, general_manager_id, site_name, cost_of_project, amount_made, total_profits, number_of_days_on_project):
+        self.site_name = site_name
         self.cost_of_project = cost_of_project
         self.general_manager_id = general_manager_id
         self.amount_made = amount_made
@@ -156,10 +159,12 @@ class GeneralManager():
     def serialize(self):
         return {
             'general_manager_id' : self.general_manager_id,
+            'site_name': self.site_name,
             'cost_of_project': self.cost_of_project,
             'amount_made': self.amount_made,
             'total_profits': self.total_profits,
             'number_of_days_on_project': self.number_of_days_on_project,
+
         }
 
 
