@@ -20,8 +20,6 @@ const EmployeesList = (props) => {
         <p> { employee.city } </p>
         <p> { employee.state } </p>
         <p> { employee.zip } </p>
-        <h3> Pay Rate </h3>
-        <p> { employee.pay_rate } </p>
         <h3> Years Employed </h3>
         <p> { employee.years_employed } </p>
         <hr/>

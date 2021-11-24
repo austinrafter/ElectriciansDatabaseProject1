@@ -821,6 +821,87 @@ def jobs():
         jobs.append(job)
     return jsonify([e.serialize() for e in jobs])
 
+@app.route("/inventory" , methods=["GET"], strict_slashes=False)
+@cross_origin()
+def inventory():
+    locations = []
+    cursor.execute("SELECT INVENTORY_ID FROM INVENTORY")
+    inventory_id = cursor.fetchall()
+    cursor.execute("SELECT MATERIAL_NAME FROM INVENTORY")
+    material_name = cursor.fetchall()
+    cursor.execute("SELECT COST_PER_UNIT FROM INVENTORY")
+    cost_per_unit = cursor.fetchall()
+    cursor.execute("SELECT WEIGHT_PER_UNIT FROM INVENTORY")
+    weight_per_unit = cursor.fetchall()
+    location_names = []
+    job_info = []
+    for x in range(len(inventory_id)):
+        job_info.append([inventory_id[x],material_name[x],cost_per_unit[x],weight_per_unit[x]])
+    jobs = []
+    for x in job_info:
+        job = Inventory(x[0],x[1],x[2],x[3])
+        jobs.append(job)
+    return jsonify([e.serialize() for e in jobs])
+
+@app.route("/electricians" , methods=["GET"], strict_slashes=False)
+@cross_origin()
+def electricians():
+    locations = []
+    cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN")
+    electrician_id = cursor.fetchall()
+    cursor.execute("SELECT PERSON_ID FROM ELECTRICIAN")
+    person_id = cursor.fetchall()
+    first_names = []
+    last_names = []
+    addresses = []
+    cityStateZips = []
+    for x in person_id:
+        cursor.execute("SELECT FIRST_NAME FROM PERSON WHERE PERSON_ID = %s", [x[0]])
+        first_name = cursor.fetchone()
+        first_names.append(first_name[0])
+        cursor.execute("SELECT LAST_NAME FROM PERSON WHERE PERSON_ID = %s", [x[0]])
+        last_name = cursor.fetchone()
+        last_names.append(last_name[0])
+        cursor.execute("SELECT ADDRESS FROM PERSON WHERE PERSON_ID = %s", [x[0]])
+        address = cursor.fetchone()
+        addresses.append(address[0])
+        cursor.execute("SELECT CITY_STATE_ZIP_ID FROM PERSON WHERE PERSON_ID = %s", [x[0]])
+        city_state_zip_id = cursor.fetchone()
+        cityStateZips.append(city_state_zip_id[0])
+    citys = []
+    states = []
+    zips = []
+    for x in cityStateZips:
+        cursor.execute("SELECT CITY FROM CITY_STATE_ZIP WHERE CITY_STATE_ZIP_ID = %s", [x])
+        city = cursor.fetchone()
+        citys.append(city[0])
+        cursor.execute("SELECT STATE FROM CITY_STATE_ZIP WHERE CITY_STATE_ZIP_ID = %s", [x])
+        state = cursor.fetchone()
+        states.append(state[0])
+        cursor.execute("SELECT ZIPCODE FROM CITY_STATE_ZIP WHERE CITY_STATE_ZIP_ID = %s", [x])
+        zipcode = cursor.fetchone()
+        zips.append(zipcode[0])
+    cursor.execute("SELECT POSITION_ID FROM ELECTRICIAN")
+    position_id = cursor.fetchall()
+    position_names = []
+    for x in position_id:
+        cursor.execute("SELECT POSITION_NAME FROM EMPLOYEE_POSITION WHERE POSITION_ID = %s", [x[0]])
+        name = cursor.fetchone()
+        position_names.append(name[0])
+    cursor.execute("SELECT YEARS_EMPLOYED FROM ELECTRICIAN")
+    years_employed = cursor.fetchall()
+    cursor.execute("SELECT HOURLY_RATE FROM ELECTRICIAN")
+    hourly_rate = cursor.fetchall()
+    location_names = []
+    job_info = []
+    for x in range(len(electrician_id)):
+        job_info.append([electrician_id[x],first_names[x],last_names[x],addresses[x], citys[x], states[x], zips[x], position_names[x], hourly_rate[x], years_employed[x] ])
+    jobs = []
+    for x in job_info:
+        job = Employees(x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9])
+        jobs.append(job)
+    return jsonify([e.serialize() for e in jobs])
+
 def convertTuple(tup):
     # initialize an empty string
     str = ''

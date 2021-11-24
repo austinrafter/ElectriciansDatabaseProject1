@@ -15,6 +15,8 @@ import Project_Manager from "./Pages/Project_Manager";
 import General_Manager from "./Pages/General_Manager";
 import Jobs from "./Pages/Jobs";
 import Home from "./Pages/Home";
+import Inventory from "./Pages/Inventory";
+import Electricians from "./Pages/Electricians";
 
 function App() {
  const insertedJob = (job) =>{
@@ -91,6 +93,12 @@ function App() {
         <Link to="/jobs">Jobs</Link>
       </div>
       <div>
+        <Link to="/inventory">Inventory</Link>
+      </div>
+      <div>
+        <Link to="/electricians">Electricians</Link>
+      </div>
+      <div>
         <Link to="/general_manager">General Managers</Link>
       </div>
       <div>
@@ -106,6 +114,10 @@ function App() {
       <Route path="/" element={<Home />}>
         </Route>
         <Route path="/jobs" element={<Jobs />}>
+        </Route>
+        <Route path="/inventory" element={<Inventory />}>
+        </Route>
+        <Route path="/electricians" element={<Electricians />}>
         </Route>
         <Route path="/general_manager" element={<General_Manager />}>
         </Route>
