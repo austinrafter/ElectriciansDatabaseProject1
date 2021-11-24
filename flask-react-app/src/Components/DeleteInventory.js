@@ -60,7 +60,7 @@ const DeleteInventory = (props) => {
            <h2> "Enter information about the inventory item to delete" </h2>
              <form onSubmit = {handleSubmit} >
 
-                     <label htmlFor="material_name" className="form-label">First Name</label>
+                     <label htmlFor="material_name" className="form-label">Material Name</label>
                      <input
                      type="text"
                      className="form-control"
@@ -70,7 +70,7 @@ const DeleteInventory = (props) => {
                      required
                      />
 
-                      <label htmlFor="cost_per_unit" className="form-label">Last Name</label>
+                      <label htmlFor="cost_per_unit" className="form-label">Cost Per Unit</label>
                       <input
                       type="text"
                       className="form-control"
@@ -80,7 +80,7 @@ const DeleteInventory = (props) => {
                       required
                       />
 
-                      <label htmlFor="weight_per_unit" className="form-label">Address</label>
+                      <label htmlFor="weight_per_unit" className="form-label">Weight Per Unit</label>
                       <input
                       type="text"
                       className="form-control"

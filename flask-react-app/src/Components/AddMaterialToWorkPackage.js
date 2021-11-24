@@ -62,7 +62,7 @@ const AddMaterialToWorkPackage = (props) => {
            <h2> Enter the information about the material on the job </h2>
              <form onSubmit = {handleSubmit} >
 
-                     <label htmlFor="material_name" className="form-label">First Name</label>
+                     <label htmlFor="material_name" className="form-label">Material Name</label>
                      <input
                      type="text"
                      className="form-control"
@@ -72,7 +72,7 @@ const AddMaterialToWorkPackage = (props) => {
                      required
                      />
 
-                      <label htmlFor="work_package_name" className="form-label">Last Name</label>
+                      <label htmlFor="work_package_name" className="form-label">Work Package Name</label>
                       <input
                       type="text"
                       className="form-control"
@@ -82,7 +82,7 @@ const AddMaterialToWorkPackage = (props) => {
                       required
                       />
 
-                      <label htmlFor="site_name" className="form-label">Address</label>
+                      <label htmlFor="site_name" className="form-label">Site Name</label>
                       <input
                       type="text"
                       className="form-control"
@@ -92,7 +92,7 @@ const AddMaterialToWorkPackage = (props) => {
                       required
                       />
 
-                      <label htmlFor="amount_alloted" className="form-label">Address</label>
+                      <label htmlFor="amount_alloted" className="form-label">Amount Alloted</label>
                       <input
                       type="text"
                       className="form-control"
@@ -102,7 +102,7 @@ const AddMaterialToWorkPackage = (props) => {
                       required
                       />
 
-                      <label htmlFor="amount_used" className="form-label">Address</label>
+                      <label htmlFor="amount_used" className="form-label">Amount Used</label>
                       <input
                       type="text"
                       className="form-control"

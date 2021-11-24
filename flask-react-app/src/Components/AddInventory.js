@@ -60,7 +60,7 @@ const AddInventory = (props) => {
            <h2> Enter your information to see the right info about jobs </h2>
              <form onSubmit = {handleSubmit} >
 
-                     <label htmlFor="material_name" className="form-label">First Name</label>
+                     <label htmlFor="material_name" className="form-label">Material Name</label>
                      <input
                      type="text"
                      className="form-control"
@@ -70,7 +70,7 @@ const AddInventory = (props) => {
                      required
                      />
 
-                      <label htmlFor="cost_per_unit" className="form-label">Last Name</label>
+                      <label htmlFor="cost_per_unit" className="form-label">Cost per unit</label>
                       <input
                       type="text"
                       className="form-control"
@@ -80,7 +80,7 @@ const AddInventory = (props) => {
                       required
                       />
 
-                      <label htmlFor="weight_per_unit" className="form-label">Address</label>
+                      <label htmlFor="weight_per_unit" className="form-label">Weight per unit</label>
                       <input
                       type="text"
                       className="form-control"

@@ -65,7 +65,7 @@ const AddElectricianOnWorkPackage = (props) => {
            <h2> Enter information about the electrician and work package </h2>
              <form onSubmit = {handleSubmit} >
 
-                     <label htmlFor="electricians_first_name" className="form-label">First Name</label>
+                     <label htmlFor="electricians_first_name" className="form-label">Electricians First Name</label>
                      <input
                      type="text"
                      className="form-control"
@@ -75,7 +75,7 @@ const AddElectricianOnWorkPackage = (props) => {
                      required
                      />
 
-                      <label htmlFor="electricians_last_name" className="form-label">Last Name</label>
+                      <label htmlFor="electricians_last_name" className="form-label">Electricians Last Name</label>
                       <input
                       type="text"
                       className="form-control"
@@ -85,7 +85,7 @@ const AddElectricianOnWorkPackage = (props) => {
                       required
                       />
 
-                      <label htmlFor="electricians_position" className="form-label">Address</label>
+                      <label htmlFor="electricians_position" className="form-label">Electricians Position</label>
                       <input
                       type="text"
                       className="form-control"
@@ -95,7 +95,7 @@ const AddElectricianOnWorkPackage = (props) => {
                       required
                       />
 
-                      <label htmlFor="electricians_address" className="form-label">Address</label>
+                      <label htmlFor="electricians_address" className="form-label">Electricians Address</label>
                       <input
                       type="text"
                       className="form-control"
@@ -105,7 +105,7 @@ const AddElectricianOnWorkPackage = (props) => {
                       required
                       />
 
-                      <label htmlFor="work_package_name" className="form-label">Address</label>
+                      <label htmlFor="work_package_name" className="form-label">Work Package Name</label>
                       <input
                       type="text"
                       className="form-control"
@@ -115,7 +115,7 @@ const AddElectricianOnWorkPackage = (props) => {
                       required
                       />
 
-                      <label htmlFor="site_name" className="form-label">Years Employed</label>
+                      <label htmlFor="site_name" className="form-label">Site Name</label>
                      <input
                      type="text"
                      className="form-control"
