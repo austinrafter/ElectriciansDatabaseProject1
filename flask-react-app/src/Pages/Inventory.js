@@ -18,7 +18,6 @@ useEffect(()=>{
 
     return(
     <div>
-    <h1>Inventory</h1>
         <InventoryList
          inventorys={inventorys}
          />
