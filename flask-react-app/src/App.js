@@ -10,8 +10,6 @@ import Electricians from "./Pages/Electricians";
 
 function App() {
 
-
-
   return (
       <div className="App container m-4">
       <div className="row">
