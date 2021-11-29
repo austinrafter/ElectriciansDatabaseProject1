@@ -339,8 +339,8 @@ def get_general_manager_view(job_site_name):
 def insert_into_location(location_name):
     cursor.execute("SELECT LOCATION_ID FROM LOCATION WHERE LOCATION_NAME = %s", [location_name])
     location = cursor.fetchone()
-    if location[0] == None:
-        cursor.execute("INSERT INTO LOCATION (LOCATION_NAME) VALUES (?);", [location_name])
+    if location == None:
+        cursor.execute("INSERT INTO LOCATION (LOCATION_NAME) VALUES (%s);", [location_name])
         conn.commit()
 
 def delete_from_location(location_name):
@@ -351,23 +351,23 @@ def delete_from_location(location_name):
 def insert_into_city_state_zip(city,state,zipcode):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s;", [city, state, zipcode])
     id = cursor.fetchone
-    if id[0] == None:
-        cursor.execute("INSERT INTO CITY_STATE_ZIP (CITY,STATE,ZIPCODE) VALUES (?,?,?);", [city,state,zipcode])
+    if id == None:
+        cursor.execute("INSERT INTO CITY_STATE_ZIP (CITY,STATE,ZIPCODE) VALUES (%s,%s,%s);", [city,state,zipcode])
         conn.commit()
 
 def delete_from_city_state_zip(city,state,zipcode):
-    cursor.execute("DELETE FROM CITY_STATE_ZIP WHERE CITY= ? AND STATE = ? AND ZIPCODE = ?);", [city,state,zipcode])
+    cursor.execute("DELETE FROM CITY_STATE_ZIP WHERE CITY= %s AND STATE = %s AND ZIPCODE = %s);", [city,state,zipcode])
     conn.commit()
 
 
 
 def insert_into_person(first_name,last_name,Address,city,state,zipcode):
     insert_into_city_state_zip(city,state,zipcode)
-    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME = %s AND LAST_NAME = %s AND ADDRESS = %S AND CITY_STATE_ZIP_ID = %s;",[first_name, last_name, Address, city_state_zip[0]])
     person = cursor.fetchone()
-    if person[0] == None:
+    if person == None:
         cursor.execute("INSERT INTO PERSON (FIRST_NAME,LAST_NAME,ADDRESS, CITY_STATE_ZIP_ID) VALUES (?,?,?,?);", [first_name,last_name, Address, city_state_zip[0]])
         conn.commit()
 
@@ -379,8 +379,8 @@ def delete_from_person(first_name,last_name,Address,city,state,zipcode):
 
 def insert_into_position(position):
     cursor.execute(" SELECT POSITION_ID FROM  EMPLOYEE_POSITION WHERE POSITION_NAME = %s;", [position])
-    position = cursor.fetchone()
-    if position[0] == None:
+    position_here = cursor.fetchone()
+    if position_here == None:
         cursor.execute(" INSERT INTO EMPLOYEE_POSITION (POSITION_NAME) VALUES (?);", [position])
         conn.commit()
 
@@ -391,12 +391,12 @@ def delete_from_position(position):
 
 
 def insert_into_job_site(location_name, site_name, start_date):
-    cursor.execute("SELECT LOCATION_ID FROM LOCATION WHERE LOCATION_NAME=?", [location_name])
+    cursor.execute("SELECT LOCATION_ID FROM LOCATION WHERE LOCATION_NAME=%s", [location_name])
     location = cursor.fetchone()
-    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %S AND LOCATION_ID = %S AND START_DATE = %s;", [site_name, location[0], start_date])
+    cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s AND LOCATION_ID = %s AND START_DATE = %s;", [site_name, location[0], start_date])
     job = cursor.fetchone()
-    if job[0] == None:
-        cursor.execute("INSERT INTO JOB_SITE (SITE_NAME,LOCATION_ID,START_DATE) VALUES (?,?,?);", [site_name, location[0],start_date])
+    if job == None:
+        cursor.execute("INSERT INTO JOB_SITE (SITE_NAME,LOCATION_ID,START_DATE) VALUES (%s,%s,%s);", [site_name, location[0],start_date])
         conn.commit()
 
 def delete_from_job_site(location_name, site_name, start_date):
@@ -959,7 +959,7 @@ def get_jobs_by_location(location_name):
 def delete_job():
     location = request.form['location']
     site_name = request.form['site_name']
-    start = request.form['start']
+    start_date = request.form['start_date']
     first_name = request.json['first_name']
     last_name = request.json['last_name']
     position = request.json['position']
@@ -970,26 +970,26 @@ def delete_job():
 
     general_manager = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
     if general_manager:
-        delete = delete_from_job_site(location, site_name, start)
+        delete = delete_from_job_site(location, site_name, start_date)
         if delete == None:
-            job = Jobs(1,location,site_name,start)
+            job = Jobs(1,location,site_name,start_date)
             jobs = [job]
             return jsonify([e.serialize() for e in jobs])
         else:
-            job = Jobs(1, "Job does not exist", "Job does not exist", start)
+            job = Jobs(1, "Job does not exist", "Job does not exist", start_date)
             jobs = [job]
             return jsonify([e.serialize() for e in jobs])
     else:
-        job = Jobs(1, "You are not a general manager and may not add new jobs", "You are not a general manager and may not add new jobs", start)
+        job = Jobs(1, "You are not a general manager and may not add new jobs", "You are not a general manager and may not add new jobs", start_date)
         jobs = [job]
         return jsonify([e.serialize() for e in jobs])
 
 @app.route("/add_job", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_job():
-    location = request.form['location']
-    site_name = request.form['site_name']
-    start = request.form['start']
+    location = request.json['location']
+    site_name = request.json['site_name']
+    start_date = request.json['start_date']
     first_name = request.json['first_name']
     last_name = request.json['last_name']
     position = request.json['position']
@@ -1001,12 +1001,12 @@ def add_job():
     general_manager = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
     if general_manager:
         insert_into_location(location)
-        insert_into_job_site(location, site_name, start)
-        job = Jobs(1,location,site_name,start)
+        insert_into_job_site(location, site_name, start_date)
+        job = Jobs(1,location,site_name,start_date)
         jobs = [job]
         return jsonify([e.serialize() for e in jobs])
     else:
-        job = Jobs(1, "You are not a general manager and may not add new jobs", "You are not a general manager and may not add new jobs", start)
+        job = Jobs(1, "You are not a general manager and may not add new jobs", "You are not a general manager and may not add new jobs", start_date)
         jobs = [job]
         return jsonify([e.serialize() for e in jobs])
 
