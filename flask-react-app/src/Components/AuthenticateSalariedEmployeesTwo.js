@@ -132,7 +132,7 @@ const PositionAuthenticationFormTwo = (props) => {
                      required
                      />
 
-                     <label htmlFor="job_to_view" className="form-label">Years Employed</label>
+                     <label htmlFor="job_to_view" className="form-label">Job to view</label>
                      <input
                      type="text"
                      className="form-control"

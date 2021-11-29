@@ -531,7 +531,7 @@ def add_electrician_to_work_package():
             return jsonify([e.serialize() for e in inventorys])
         cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s", [electricians_first_name,electricians_last_name,electricians_address])
         person = cursor.fetchone()
-        if person[0] == None:
+        if person == None:
             inventory = ElectricianOnWorkPackage(1, "This person is not in our system",
                                                  "This person is not in our system",
                                                  "This person is not in our system",
@@ -547,7 +547,7 @@ def add_electrician_to_work_package():
                                                  "This electrician is not in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
-        cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [site_name])
+        cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [site_name])
         job_site = cursor.fetchone()
         if job_site == None:
             inventory = ElectricianOnWorkPackage(1, "This job is not in our system",
@@ -556,7 +556,7 @@ def add_electrician_to_work_package():
                                                  "This job is not in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
-        cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [work_package_name,job_site[0]])
+        cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = %s AND JOB_SITE_ID = %s", [work_package_name,job_site[0]])
         work_package = cursor.fetchone()
         if work_package == None:
             inventory = ElectricianOnWorkPackage(1, "This work package is not in our system",
@@ -565,7 +565,7 @@ def add_electrician_to_work_package():
                                                  "This work package is not in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
-        cursor.execute("INSERT INTO ELECTRICIAN_ON_WORK_PACKAGE(ELECTRICIAN_ID,WORK_PACKAGE_ID) VALUES (?,?);", [electrician[0],work_package[0]])
+        cursor.execute("INSERT INTO ELECTRICIAN_ON_WORK_PACKAGE(ELECTRICIAN_ID,WORK_PACKAGE_ID) VALUES (%s,%s);", [electrician[0],work_package[0]])
         conn.commit()
         inventory = ElectricianOnWorkPackage(1, electricians_first_name,
                                              electricians_last_name,
@@ -612,7 +612,7 @@ def delete_electrician_from_work_package():
         cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s",
                        [electricians_first_name, electricians_last_name, electricians_address])
         person = cursor.fetchone()
-        if person[0] == None:
+        if person == None:
             inventory = ElectricianOnWorkPackage(1, "This person is not in our system",
                                                  "This person is not in our system",
                                                  "This person is not in our system",
@@ -629,7 +629,7 @@ def delete_electrician_from_work_package():
                                                  "This electrician is not in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
-        cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = ?", [site_name])
+        cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [site_name])
         job_site = cursor.fetchone()
         if job_site == None:
             inventory = ElectricianOnWorkPackage(1, "This job is not in our system",
@@ -638,7 +638,7 @@ def delete_electrician_from_work_package():
                                                  "This job is not in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
-        cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?",
+        cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = %s AND JOB_SITE_ID = %s",
                        [work_package_name, job_site[0]])
         work_package = cursor.fetchone()
         if work_package == None:
@@ -648,7 +648,7 @@ def delete_electrician_from_work_package():
                                                  "This work package is not in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
-        cursor.execute("DELETE FROM ELECTRICIAN_ON_WORK_PACKAGE WHERE ELECTRICIAN_ID = ? AND WORK_PACKAGE_ID = ?;",
+        cursor.execute("DELETE FROM ELECTRICIAN_ON_WORK_PACKAGE WHERE ELECTRICIAN_ID = %s AND WORK_PACKAGE_ID = %s;",
                        [electrician[0], work_package[0]])
         conn.commit()
         inventory = ElectricianOnWorkPackage(1, electricians_first_name,

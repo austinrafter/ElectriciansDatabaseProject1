@@ -20,7 +20,7 @@ const DeleteElectricianOffWorkPackage = (props) => {
     const [address, setAddress] = useState('')
     const [city, setCity] = useState('')
     const [state, setState] = useState('')
-    const [zip, setZip] = useState('')
+    const [zipcode, setZip] = useState('')
     const [position, setPosition] = useState('')
     const [pay_rate, setPayRate] = useState('')
     const [years_employed, setYearsEmployed] = useState('')
@@ -28,7 +28,7 @@ const DeleteElectricianOffWorkPackage = (props) => {
     const [electricians_on_packages, setElectriciansOnPackages] = useState([]);
 
     const checkInventory = () =>{
-    APIServiceFifteen.DeleteElectricianToWorkPackage({electricians_first_name,electricians_last_name,electricians_position,electricians_address, work_package_name, site_name ,first_name,last_name,position,address,city,state,zip})
+    APIServiceFifteen.DeleteElectricianToWorkPackage({electricians_first_name,electricians_last_name,electricians_position,electricians_address, work_package_name, site_name ,first_name,last_name,position,address,city,state,zipcode})
     .then((response) => setElectriciansOnPackages(response))
           .catch(error => console.log('error',error))
           }
@@ -177,12 +177,12 @@ const DeleteElectricianOffWorkPackage = (props) => {
                      required
                      />
 
-                      <label htmlFor="zip" className="form-label">Zipcode</label>
+                      <label htmlFor="zipcode" className="form-label">Zipcode</label>
                      <input
                      type="text"
                      className="form-control"
                      placeholder ="Enter zip code"
-                     value={zip}
+                     value={zipcode}
                      onChange={(e)=>setZip(e.target.value)}
                      required
                      />
