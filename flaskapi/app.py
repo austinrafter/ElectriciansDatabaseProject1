@@ -400,13 +400,14 @@ def insert_into_job_site(location_name, site_name, start_date):
         conn.commit()
 
 def delete_from_job_site(location_name, site_name, start_date):
-    cursor.execute("SELECT LOCATION_ID FROM LOCATION WHERE LOCATION_NAME=?", [location_name])
+    cursor.execute("SELECT LOCATION_ID FROM LOCATION WHERE LOCATION_NAME=%s", [location_name])
     location = cursor.fetchone()
     if location == None:
-        return "Unable to delete a job with location that does not exist"
+        return location
     else:
-        cursor.execute("DELETE FROM JOB_SITE WHERE SITE_NAME = ? AND LOCATION_ID = ? AND START_DATE = ?;", [site_name, location[0],start_date])
+        cursor.execute("DELETE FROM JOB_SITE WHERE SITE_NAME = %s AND LOCATION_ID = %s AND START_DATE = %s;", [site_name, location[0],start_date])
         conn.commit()
+        return 1
 
 
 
@@ -957,9 +958,9 @@ def get_jobs_by_location(location_name):
 @app.route("/delete_job", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_job():
-    location = request.form['location']
-    site_name = request.form['site_name']
-    start_date = request.form['start_date']
+    location = request.json['location']
+    site_name = request.json['site_name']
+    start_date = request.json['start_date']
     first_name = request.json['first_name']
     last_name = request.json['last_name']
     position = request.json['position']
@@ -971,7 +972,7 @@ def delete_job():
     general_manager = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
     if general_manager:
         delete = delete_from_job_site(location, site_name, start_date)
-        if delete == None:
+        if delete != None:
             job = Jobs(1,location,site_name,start_date)
             jobs = [job]
             return jsonify([e.serialize() for e in jobs])
