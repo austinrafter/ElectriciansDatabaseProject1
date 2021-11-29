@@ -17,16 +17,15 @@ const AddInventory = (props) => {
     const [address, setAddress] = useState('')
     const [city, setCity] = useState('')
     const [state, setState] = useState('')
-    const [zip, setZip] = useState('')
+    const [zipcode, setZip] = useState('')
     const [position, setPosition] = useState('')
     const [pay_rate, setPayRate] = useState('')
     const [years_employed, setYearsEmployed] = useState('')
-    const [job_to_view, setJobToView] = useState('')
     const [general_managers, setGeneralManagers] = useState([]);
     const [inventorys, setInventorys] = useState([]);
 
     const checkInventory = () =>{
-    APIServiceTwelve.InsertEmployee({material_name,cost_per_unit,weight_per_unit ,first_name,last_name,address,city,state,zip,position,pay_rate,years_employed, job_to_view})
+    APIServiceTwelve.InsertInventory({material_name,cost_per_unit,weight_per_unit ,first_name,last_name,address,city,state,zipcode,position,pay_rate,years_employed})
     .then((response) => setInventorys(response))
           .catch(error => console.log('error',error))
           }
@@ -46,7 +45,6 @@ const AddInventory = (props) => {
           setPosition('')
           setPayRate('')
           setYearsEmployed('')
-          setJobToView('')
         }
 
         const [showFormTwo, setShowFormTwo] = useState(false);
@@ -142,12 +140,12 @@ const AddInventory = (props) => {
                      required
                      />
 
-                      <label htmlFor="zip" className="form-label">Zipcode</label>
+                      <label htmlFor="zipcode" className="form-label">Zipcode</label>
                      <input
                      type="text"
                      className="form-control"
                      placeholder ="Enter zip code"
-                     value={zip}
+                     value={zipcode}
                      onChange={(e)=>setZip(e.target.value)}
                      required
                      />
@@ -179,16 +177,6 @@ const AddInventory = (props) => {
                      placeholder ="Enter years employed"
                      value={years_employed}
                      onChange={(e)=>setYearsEmployed(e.target.value)}
-                     required
-                     />
-
-                     <label htmlFor="job_to_view" className="form-label">Years Employed</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter job_to_view"
-                     value={job_to_view}
-                     onChange={(e)=>setJobToView(e.target.value)}
                      required
                      />
 

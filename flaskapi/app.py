@@ -267,7 +267,7 @@ def add_inventory():
 
 @app.route("/delete_inventory" , methods=["POST"], strict_slashes=False)
 @cross_origin()
-def delete_from_inventory(material_name, cost_per_unit, weight_per_unit):
+def delete_from_inventory():
     material_name = request.json['material_name']
     cost_per_unit = request.json['cost_per_unit']
     weight_per_unit = request.json['weight_per_unit']
@@ -290,7 +290,7 @@ def delete_from_inventory(material_name, cost_per_unit, weight_per_unit):
             inventory = Inventory(1, "That inventory is not in our system to delete", 0, 0)
             inventorys = [inventory]
         else:
-            cursor.execute("DELETE FROM INVENTORY WHERE MATERIAL_NAME = %s AND COST_PER_UNIT = ? AND WEIGHT_PER_UNIT = ?;",
+            cursor.execute("DELETE FROM INVENTORY WHERE MATERIAL_NAME = %s AND COST_PER_UNIT = %s AND WEIGHT_PER_UNIT = %s;",
                        [material_name, cost_per_unit, weight_per_unit])
             conn.commit()
             inventory = Inventory(1, material_name, cost_per_unit, weight_per_unit)
@@ -350,7 +350,7 @@ def delete_from_location(location_name):
 
 def insert_into_city_state_zip(city,state,zipcode):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s;", [city, state, zipcode])
-    id = cursor.fetchone
+    id = cursor.fetchone()
     if id == None:
         cursor.execute("INSERT INTO CITY_STATE_ZIP (CITY,STATE,ZIPCODE) VALUES (%s,%s,%s);", [city,state,zipcode])
         conn.commit()
@@ -365,27 +365,27 @@ def insert_into_person(first_name,last_name,Address,city,state,zipcode):
     insert_into_city_state_zip(city,state,zipcode)
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
-    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME = %s AND LAST_NAME = %s AND ADDRESS = %S AND CITY_STATE_ZIP_ID = %s;",[first_name, last_name, Address, city_state_zip[0]])
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME = %s AND LAST_NAME = %s AND ADDRESS = %s AND CITY_STATE_ZIP_ID = %s;",[first_name, last_name, Address, city_state_zip[0]])
     person = cursor.fetchone()
     if person == None:
-        cursor.execute("INSERT INTO PERSON (FIRST_NAME,LAST_NAME,ADDRESS, CITY_STATE_ZIP_ID) VALUES (?,?,?,?);", [first_name,last_name, Address, city_state_zip[0]])
+        cursor.execute("INSERT INTO PERSON (FIRST_NAME,LAST_NAME,ADDRESS, CITY_STATE_ZIP_ID) VALUES (%s,%s,%s,%s);", [first_name,last_name, Address, city_state_zip[0]])
         conn.commit()
 
 def delete_from_person(first_name,last_name,Address,city,state,zipcode):
-    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
-    cursor.execute("DELETE FROM PERSON WHERE FIRST_NAME = ? AND LAST_NAME = ? AND ADDRESS = ? AND CITY_STATE_ZIP_ID = ?;", [first_name,last_name, Address, city_state_zip[0]])
+    cursor.execute("DELETE FROM PERSON WHERE FIRST_NAME = %s AND LAST_NAME = %s AND ADDRESS = %s AND CITY_STATE_ZIP_ID = %s;", [first_name,last_name, Address, city_state_zip[0]])
     conn.commit()
 
 def insert_into_position(position):
     cursor.execute(" SELECT POSITION_ID FROM  EMPLOYEE_POSITION WHERE POSITION_NAME = %s;", [position])
     position_here = cursor.fetchone()
     if position_here == None:
-        cursor.execute(" INSERT INTO EMPLOYEE_POSITION (POSITION_NAME) VALUES (?);", [position])
+        cursor.execute(" INSERT INTO EMPLOYEE_POSITION (POSITION_NAME) VALUES (%s);", [position])
         conn.commit()
 
 def delete_from_position(position):
-    cursor.execute(" DELETE FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?;", [position])
+    cursor.execute(" DELETE FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s;", [position])
     conn.commit()
 
 
@@ -449,51 +449,51 @@ def insert_into_electrician(first_name,last_name,Address,city,state,zipcode, yea
 
 def insert_into_salaried_employee(first_name,last_name,Address,city,state,zipcode, years_employed, salary_rate, position_name):
     insert_into_city_state_zip(city,state,zipcode)
-    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
     insert_into_person(first_name,last_name,Address,city,state,zipcode)
-    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
     insert_into_position(position_name)
-    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
     cursor.execute("SELECT SALARIED_EMPLOYEE_ID FROM SALARIED_EMPLOYEE WHERE PERSON_ID=%s AND POSITION_ID=%s AND YEARS_EMPLOYED=%s AND SALARY_RATE=%s;",[person[0], position[0], years_employed, salary_rate])
     salary = cursor.fetchone()
     if salary == None:
-        cursor.execute("INSERT INTO SALARIED_EMPLOYEE(PERSON_ID,POSITION_ID,YEARS_EMPLOYED, SALARY_RATE) VALUES (?, ?, ?, ?);", [person[0],position[0],years_employed,salary_rate])
+        cursor.execute("INSERT INTO SALARIED_EMPLOYEE(PERSON_ID,POSITION_ID,YEARS_EMPLOYED, SALARY_RATE) VALUES (%s, %s, %s, %s);", [person[0],position[0],years_employed,salary_rate])
         conn.commit()
 
 def delete_from_electrician(first_name,last_name,Address,city,state,zipcode, years_employed, hourly_rate, position_name):
-    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
     if city_state_zip == None:
         return False
-    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
     if person == None:
         return False
-    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
     if position == None:
         return False
-    cursor.execute("DELETE FROM ELECTRICIAN WHERE PERSON_ID = ? AND POSITION_ID = ? AND YEARS_EMPLOYED = ? AND HOURLY_RATE = ?;", [person[0],position[0],years_employed,hourly_rate])
+    cursor.execute("DELETE FROM ELECTRICIAN WHERE PERSON_ID = %s AND POSITION_ID = %s AND YEARS_EMPLOYED = %s AND HOURLY_RATE = %s;", [person[0],position[0],years_employed,hourly_rate])
     conn.commit()
     return True
 
 def delete_from_salaried_employee(first_name,last_name,Address,city,state,zipcode, years_employed, salary_rate, position_name):
-    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
     if city_state_zip == None:
         return False
-    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
     if person == None:
         return False
-    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
     if position == None:
         return False
-    cursor.execute("DELETE FROM SALARIED_EMPLOYEE WHERE PERSON_ID = ? AND POSITION_ID = ? AND YEARS_EMPLOYED = ? AND SALARY_RATE = ?;", [person[0],position[0],years_employed,salary_rate])
+    cursor.execute("DELETE FROM SALARIED_EMPLOYEE WHERE PERSON_ID = %s AND POSITION_ID = %s AND YEARS_EMPLOYED = %s AND SALARY_RATE = %s;", [person[0],position[0],years_employed,salary_rate])
     conn.commit()
     return True
 
