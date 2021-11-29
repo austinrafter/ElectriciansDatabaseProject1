@@ -1,14 +1,4 @@
 import './App.css';
-import JobForm from './Components/Job_form';
-import JobsList from './Components/JobsList';
-import WorkPackagesList from './Components/Work_Packages_List';
-import PositionAuthenticationForm from './Components/Authenticate_Salaried_Employees';
-import { useState, useEffect } from "react";
-import ForemansList from './Components/ForemansList';
-import ProjectManagersList from './Components/ProjectManagersList';
-import GeneralManagersList from './Components/GeneralManagersList';
-import PositionAuthenticationFormTwo from './Components/AuthenticateSalariedEmployeesTwo';
-import PositionAuthenticationFormThree from './Components/AuthenticateSalariedEmployeesThree';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Foreman from "./Pages/Foreman";
 import Project_Manager from "./Pages/Project_Manager";
@@ -19,66 +9,7 @@ import Inventory from "./Pages/Inventory";
 import Electricians from "./Pages/Electricians";
 
 function App() {
- const insertedJob = (job) =>{
-    const new_jobs = [...jobs,job]
-    setJobs(new_jobs)
-  }
 
-  const findForeman = (foreman) =>{
-    const new_salariedEmployee = [...foremen,foreman]
-    setForemen(new_salariedEmployee)
-  }
-
-   const findProjectManager = (project_manager) =>{
-    const new_projectManager = [...project_managers,project_manager]
-    setProjectManagers(new_projectManager)
-  }
-
-   const findGeneralManager = (general_manager) =>{
-    const new_generalManager = [...general_managers,general_manager]
-    setGeneralManagers(new_generalManager)
-  }
-
-  const [jobs, setJobs] = useState([]);
-  const [foremen, setForemen] = useState([]);
-  const [project_managers, setProjectManagers] = useState([]);
-  const [general_managers, setGeneralManagers] = useState([]);
-
-
- // define variables for the present state of the form and another to change its state
-  const [showForm, setShowForm] = useState(false);
-  const [showFormTwo, setShowFormTwo] = useState(false);
-  const [showFormThree, setShowFormThree] = useState(false);
-  const [showFormFour, setShowFormFour] = useState(false);
-
- // toggle between the two states,visible and hidden
-  const toggleShowForm = () => {
-    setShowForm(!showForm);
-  }
-
-  const toggleShowFormTwo = () => {
-    setShowFormTwo(!showFormTwo);
-  }
-
-  const toggleShowFormThree = () => {
-    setShowFormThree(!showFormThree);
-  }
-
-  const toggleShowFormFour = () => {
-    setShowFormFour(!showFormFour);
-  }
-
-    useEffect(()=>{
-      fetch('http://localhost:5000/jobs',{
-        'methods':'GET',
-        headers : {
-          'Content-Type':'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(response => setJobs(response))
-      .catch(error => console.log(error))
-    },[]);
 
 
   return (
