@@ -433,10 +433,10 @@ def delete_from_work_package(job_site_name, work_package_name, price_of_work, ho
 
 def insert_into_electrician(first_name,last_name,Address,city,state,zipcode, years_employed, hourly_rate, position_name):
     insert_into_city_state_zip(city, state, zipcode)
-    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = ? AND STATE = ? AND ZIPCODE = ?", [city,state,zipcode])
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
     city_state_zip = cursor.fetchone()
     insert_into_person(first_name,last_name,Address,city,state,zipcode)
-    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= ? AND LAST_NAME = ? AND ADDRESS = ? AND  CITY_STATE_ZIP_ID = ? ", [first_name,last_name,Address,city_state_zip[0]])
+    cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
     insert_into_position(position_name)
     cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
@@ -444,7 +444,7 @@ def insert_into_electrician(first_name,last_name,Address,city,state,zipcode, yea
     cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN WHERE PERSON_ID = %s AND POSITION_ID = %s AND YEARS_EMPLOYED = %s AND HOURLY_RATE = %s;",[person[0], position[0], years_employed, hourly_rate])
     electrician = cursor.fetchone()
     if electrician[0] == None:
-        cursor.execute("INSERT INTO ELECTRICIAN(PERSON_ID,POSITION_ID,YEARS_EMPLOYED, HOURLY_RATE) VALUES (?, ?, ?, ?);", [person[0],position[0],years_employed,hourly_rate])
+        cursor.execute("INSERT INTO ELECTRICIAN(PERSON_ID,POSITION_ID,YEARS_EMPLOYED, HOURLY_RATE) VALUES (%s, %s, %s, %s);", [person[0],position[0],years_employed,hourly_rate])
         conn.commit()
 
 def insert_into_salaried_employee(first_name,last_name,Address,city,state,zipcode, years_employed, salary_rate, position_name):
@@ -689,6 +689,7 @@ def insert_material_in_work_package():
     if upper_management:
         cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [site_name])
         job_site = cursor.fetchone()
+        print(job_site)
         if job_site == None:
             inventory = MaterialInWorkPackage(1, "That job site does not exist", 0, 0,
                                               "That job site does not exist",
@@ -696,7 +697,7 @@ def insert_material_in_work_package():
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
         cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = %s AND JOB_SITE_ID = %s",
-                       [work_package_name, job_site])
+                       [work_package_name, job_site[0]])
         work_package = cursor.fetchone()
         if work_package == None:
             inventory = MaterialInWorkPackage(1, "That work package does not exist", 0, 0,
@@ -705,16 +706,18 @@ def insert_material_in_work_package():
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
         cursor.execute("SELECT INVENTORY_ID FROM INVENTORY WHERE MATERIAL_NAME = %s", [material_name])
-        inventory = cursor.fetchone()
-        if inventory == None:
+        inventory_id = cursor.fetchone()
+        if inventory_id == None:
             inventory = MaterialInWorkPackage(1, "That item does not exist in our system", 0, 0,
                                               "That item does not exist in our system",
                                               "That item does not exist in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
+        print(inventory_id)
+        print(work_package)
         cursor.execute(
-            "INSERT INTO MATERIAL_IN_WORK_PACKAGE(WORK_PACKAGE_ID,INVENTORY_ID,AMOUNT_ALLOTED,AMOUNT_USED) VALUES (?, ?, ?, ?);",
-            [inventory[0], work_package[0], amount_alloted, amount_used])
+            "INSERT INTO MATERIAL_IN_WORK_PACKAGE(WORK_PACKAGE_ID,INVENTORY_ID,AMOUNT_ALLOTED,AMOUNT_USED) VALUES (%s, %s, %s, %s);",
+            [work_package[0], inventory_id[0], amount_alloted, amount_used])
         conn.commit()
         inventory = MaterialInWorkPackage(1,material_name, amount_alloted, amount_used, work_package_name, site_name)
         inventorys = [inventory]
@@ -727,7 +730,7 @@ def insert_material_in_work_package():
 
 @app.route("/delete_material_in_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
-def delete_material_in_work_package(inventory_name, work_package_name, job_site_name, material_amount_issued,material_amount_used):
+def delete_material_in_work_package():
     material_name = request.json['material_name']
     work_package_name = request.json['work_package_name']
     site_name = request.json['site_name']
@@ -754,7 +757,7 @@ def delete_material_in_work_package(inventory_name, work_package_name, job_site_
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
         cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = %s AND JOB_SITE_ID = %s",
-                       [work_package_name, job_site])
+                       [work_package_name, job_site[0]])
         work_package = cursor.fetchone()
         if work_package == None:
             inventory = MaterialInWorkPackage(1, "That work package does not exist", 0, 0,
@@ -771,8 +774,8 @@ def delete_material_in_work_package(inventory_name, work_package_name, job_site_
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
         cursor.execute(
-            "DELETE FROM MATERIAL_IN_WORK_PACKAGE WHERE WORK_PACKAGE_ID = ? AND INVENTORY_ID = ? AND AMOUNT_ALLOTED = ? AND AMOUNT_USED = ?;",
-            [inventory[0], work_package[0], amount_alloted, amount_used])
+            "DELETE FROM MATERIAL_IN_WORK_PACKAGE WHERE WORK_PACKAGE_ID = %s AND INVENTORY_ID = %s AND AMOUNT_ALLOTED = %s AND AMOUNT_USED = %s;",
+            [work_package[0], inventory[0], amount_alloted, amount_used])
         conn.commit()
         inventory = MaterialInWorkPackage(1, material_name, amount_alloted, amount_used, work_package_name, site_name)
         inventorys = [inventory]

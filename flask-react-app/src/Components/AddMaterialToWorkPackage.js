@@ -19,7 +19,7 @@ const AddMaterialToWorkPackage = (props) => {
     const [address, setAddress] = useState('')
     const [city, setCity] = useState('')
     const [state, setState] = useState('')
-    const [zip, setZip] = useState('')
+    const [zipcode, setZip] = useState('')
     const [position, setPosition] = useState('')
     const [pay_rate, setPayRate] = useState('')
     const [years_employed, setYearsEmployed] = useState('')
@@ -27,7 +27,7 @@ const AddMaterialToWorkPackage = (props) => {
     const [materials_on_packages, setMaterialsOnPackages] = useState([]);
 
     const checkInventory = () =>{
-    APIServiceSixteen.InsertMaterialToWorkPackage({material_name,work_package_name,site_name,amount_alloted, amount_used,first_name,last_name,position,address,city,state,zip})
+    APIServiceSixteen.InsertMaterialToWorkPackage({material_name,work_package_name,site_name,amount_alloted, amount_used,first_name,last_name,position,address,city,state,zipcode})
     .then((response) => setMaterialsOnPackages(response))
           .catch(error => console.log('error',error))
           }
@@ -164,12 +164,12 @@ const AddMaterialToWorkPackage = (props) => {
                      required
                      />
 
-                      <label htmlFor="zip" className="form-label">Zipcode</label>
+                      <label htmlFor="zipcode" className="form-label">Zipcode</label>
                      <input
                      type="text"
                      className="form-control"
                      placeholder ="Enter zip code"
-                     value={zip}
+                     value={zipcode}
                      onChange={(e)=>setZip(e.target.value)}
                      required
                      />
