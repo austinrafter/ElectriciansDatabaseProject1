@@ -13,10 +13,8 @@ const InventoryList = (props) => {
         <h2 variant="text-primary" size="lg">
         { inventory.material_name}
          </h2>
-         <h3> Cost per unit </h3>
-         <p> { inventory.cost_per_unit } </p>
          <h3> Weight per unit </h3>
-        <p> { inventory.weight_per_unit } </p>
+        <p> { inventory.weight_per_unit } lbs </p>
         <hr/>
         </div>
     )
