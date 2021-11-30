@@ -13,13 +13,9 @@ const EmployeesList = (props) => {
         { employee.position}
          </h2>
          <h3>  Name </h3>
-         <p> { employee.first_name } </p>
-         <p> {employee.last_name} </p>
-         <h3> Address </h3>
-        <p> { employee.address } </p>
-        <p> { employee.city } </p>
-        <p> { employee.state } </p>
-        <p> { employee.zip } </p>
+         <p> { employee.first_name }  {employee.last_name} </p>
+         <h3> Position </h3>
+         <p> {employee.position} </p>
         <h3> Years Employed </h3>
         <p> { employee.years_employed } </p>
         <hr/>
