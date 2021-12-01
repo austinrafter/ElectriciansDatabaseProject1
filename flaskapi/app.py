@@ -1006,7 +1006,7 @@ def add_job():
     if general_manager:
         insert_into_location(location)
         insert_into_job_site(location, site_name, start_date)
-        job = Jobs(1,location,site_name,start_date)
+        job = Jobs(1,start_date,site_name,location)
         jobs = [job]
         return jsonify([e.serialize() for e in jobs])
     else:
