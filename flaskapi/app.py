@@ -404,6 +404,18 @@ def delete_from_job_site(location_name, site_name, start_date):
     location = cursor.fetchone()
     if location == None:
         return False
+    cursor.execute("SELECT LOCATION_ID FROM JOB_SITE WHERE LOCATION_ID=%s", [location[0]])
+    id_of_location = cursor.fetchone()
+    if id_of_location == None:
+        return False
+    cursor.execute("SELECT SITE_NAME FROM JOB_SITE WHERE SITE_NAME=%s", [site_name])
+    site = cursor.fetchone()
+    if site == None:
+        return False
+    cursor.execute("SELECT START_DATE FROM JOB_SITE WHERE SITE_NAME=%s AND START_DATE = %s", [site_name,start_date])
+    start = cursor.fetchone()
+    if start == None:
+        return False
     cursor.execute("DELETE FROM JOB_SITE WHERE SITE_NAME = %s AND LOCATION_ID = %s AND START_DATE = %s;", [site_name, location[0],start_date])
     conn.commit()
     return True
