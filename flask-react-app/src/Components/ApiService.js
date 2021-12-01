@@ -1,6 +1,6 @@
 export default class APIService{
     static InsertJob(body){
-    return fetch('http://localhost:5000/add_job',{
+    return fetch('http://localhost:5000/flaskapi/add_job',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

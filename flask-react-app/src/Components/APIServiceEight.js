@@ -1,6 +1,6 @@
 export default class APIServiceEight{
     static DeleteJob(body){
-    return fetch('http://localhost:5000/delete_job',{
+    return fetch('http://localhost:5000/flaskapi/delete_job',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

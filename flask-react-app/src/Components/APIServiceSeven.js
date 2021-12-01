@@ -1,6 +1,6 @@
 export default class APIServiceSeven{
     static CheckPositionThree(body){
-    return fetch('http://localhost:5000/general_manager',{
+    return fetch('http://localhost:5000/flaskapi/general_manager',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

@@ -1,6 +1,6 @@
 export default class APIServiceEleven{
     static DeleteWorkPackage(body){
-    return fetch('http://localhost:5000/delete_work_package',{
+    return fetch('http://localhost:5000/flaskapi/delete_work_package',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

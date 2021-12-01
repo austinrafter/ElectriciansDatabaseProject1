@@ -1,6 +1,6 @@
 export default class APIServiceFourteen{
     static InsertElectricianToWorkPackage(body){
-    return fetch('http://localhost:5000/add_electrician_to_work_package',{
+    return fetch('http://localhost:5000/flaskapi/add_electrician_to_work_package',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

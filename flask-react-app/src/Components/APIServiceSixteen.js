@@ -1,6 +1,6 @@
 export default class APIServiceSixteen{
     static InsertMaterialToWorkPackage(body){
-    return fetch('http://localhost:5000/insert_material_in_work_package',{
+    return fetch('http://localhost:5000/flaskapi/insert_material_in_work_package',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

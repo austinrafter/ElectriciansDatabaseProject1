@@ -5,7 +5,7 @@ const Inventory = () => {
 const [inventorys, setInventorys] = useState([]);
 
 useEffect(()=>{
-      fetch('http://localhost:5000/inventory',{
+      fetch('http://localhost:5000/flaskapi/inventory',{
         'methods':'GET',
         headers : {
           'Content-Type':'application/json'

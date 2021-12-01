@@ -5,7 +5,7 @@ const Electricians = () => {
 const [employees, setEmployees] = useState([]);
 
 useEffect(()=>{
-      fetch('http://localhost:5000/electricians',{
+      fetch('http://localhost:5000/flaskapi/electricians',{
         'methods':'GET',
         headers : {
           'Content-Type':'application/json'

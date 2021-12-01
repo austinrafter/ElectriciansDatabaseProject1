@@ -1,6 +1,6 @@
 export default class APIServiceSix{
     static CheckPositionTwo(body){
-    return fetch('http://localhost:5000/project_manager',{
+    return fetch('http://localhost:5000/flaskapi/project_manager',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

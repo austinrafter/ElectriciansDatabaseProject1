@@ -1,6 +1,6 @@
 export default class APIServiceNine{
     static InsertEmployee(body){
-    return fetch('http://localhost:5000/add_employee',{
+    return fetch('http://localhost:5000/flaskapi/add_employee',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

@@ -1,6 +1,6 @@
 export default class APIServiceSeventeen{
     static DeleteMaterialFromWorkPackage(body){
-    return fetch('http://localhost:5000/delete_material_in_work_package',{
+    return fetch('http://localhost:5000/flaskapi/delete_material_in_work_package',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

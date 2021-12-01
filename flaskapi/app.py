@@ -129,7 +129,7 @@ def position_check_gm(first_name,last_name,Address,city,state,zipcode,position_n
     else:
         return False
 
-@app.route("/foreman" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/foreman" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def foreman():
     first_name = request.json['first_name']
@@ -149,7 +149,7 @@ def foreman():
     print(foreman)
     return jsonify([e.serialize() for e in foreman])
 
-@app.route("/project_manager" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/project_manager" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def project_manager():
     first_name = request.json['first_name']
@@ -172,7 +172,7 @@ def project_manager():
     return jsonify([e.serialize() for e in project_manager])
 
 
-@app.route("/general_manager" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/general_manager" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def general_manager():
     first_name = request.json['first_name']
@@ -194,7 +194,7 @@ def general_manager():
 
 
 
-@app.route("/hours_used" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/hours_used" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def change_hours_used_on_work_package():
     job = request.json['job']
@@ -218,7 +218,7 @@ def change_hours_used_on_work_package():
     else:
         return False
 
-@app.route("/material_amount_used" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/material_amount_used" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def change_material_amount_used_in_work_package():
     work_package_name = request.json['work_package_name']
@@ -234,7 +234,7 @@ def change_material_amount_used_in_work_package():
     cursor.execute("UPDATE MATERIAL_IN_WORK_PACKAGE SET AMOUNT_USED =%s WHERE INVENTORY_ID = %s AND WORK_PACKAGE_ID = %s", [amount_used, inventory[0],work_package[0]])
     conn.commit()
 
-@app.route("/add_inventory" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/add_inventory" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_inventory():
     material_name = request.json['material_name']
@@ -265,7 +265,7 @@ def add_inventory():
         inventorys = [inventory]
         return jsonify([e.serialize() for e in inventorys])
 
-@app.route("/delete_inventory" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/delete_inventory" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_from_inventory():
     material_name = request.json['material_name']
@@ -509,7 +509,7 @@ def delete_from_salaried_employee(first_name,last_name,Address,city,state,zipcod
     return True
 
 
-@app.route("/add_electrician_to_work_package" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/add_electrician_to_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_electrician_to_work_package():
     electricians_first_name = request.json['electricians_first_name']
@@ -589,7 +589,7 @@ def add_electrician_to_work_package():
         inventorys = [inventory]
         return jsonify([e.serialize() for e in inventorys])
 
-@app.route("/delete_electrician_from_work_package" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/delete_electrician_from_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_electrician_from_work_package():
     electricians_first_name = request.json['electricians_first_name']
@@ -678,7 +678,7 @@ def delete_electrician_from_work_package():
 
 
 
-@app.route("/insert_material_in_work_package" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/insert_material_in_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def insert_material_in_work_package():
     material_name = request.json['material_name']
@@ -739,7 +739,7 @@ def insert_material_in_work_package():
         inventorys = [inventory]
         return jsonify([e.serialize() for e in inventorys])
 
-@app.route("/delete_material_in_work_package" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/delete_material_in_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_material_in_work_package():
     material_name = request.json['material_name']
@@ -800,7 +800,7 @@ def delete_material_in_work_package():
         return jsonify([e.serialize() for e in inventorys])
 
 
-@app.route("/")
+@app.route("/flaskapi/")
 @cross_origin()
 def get_all_jobs():
     locations = []
@@ -810,7 +810,7 @@ def get_all_jobs():
     location_id = cursor.fetchall()
     return jsonify(jobs)
 
-@app.route("/jobs" , methods=["GET"], strict_slashes=False)
+@app.route("/flaskapi/jobs" , methods=["GET"], strict_slashes=False)
 @cross_origin()
 def jobs():
     locations = []
@@ -836,7 +836,7 @@ def jobs():
         jobs.append(job)
     return jsonify([e.serialize() for e in jobs])
 
-@app.route("/inventory" , methods=["GET"], strict_slashes=False)
+@app.route("/flaskapi/inventory" , methods=["GET"], strict_slashes=False)
 @cross_origin()
 def inventory():
     locations = []
@@ -858,7 +858,7 @@ def inventory():
         jobs.append(job)
     return jsonify([e.serialize() for e in jobs])
 
-@app.route("/electricians" , methods=["GET"], strict_slashes=False)
+@app.route("/flaskapi/electricians" , methods=["GET"], strict_slashes=False)
 @cross_origin()
 def electricians():
     locations = []
@@ -924,7 +924,7 @@ def convertTuple(tup):
         str = str + item
     return str
 
-@app.route("/work_packages" , methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/work_packages" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def work_packages():
     work_packages = []
@@ -969,7 +969,7 @@ def get_jobs_by_location(location_name):
     for job in jobs:
         print("Job Name: " +job[0] + "\nLocation: " + location_name +  "\nStart date: " + str(job[1]) + "\n\n")
 
-@app.route("/delete_job", methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/delete_job", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_job():
     location = request.json['location']
@@ -999,7 +999,7 @@ def delete_job():
         jobs = [job]
         return jsonify([e.serialize() for e in jobs])
 
-@app.route("/add_job", methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/add_job", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_job():
     location = request.json['location']
@@ -1025,7 +1025,7 @@ def add_job():
         jobs = [job]
         return jsonify([e.serialize() for e in jobs])
 
-@app.route("/add_work_package", methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/add_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_work_package():
     job = request.json['job']
@@ -1058,7 +1058,7 @@ def add_work_package():
         work_packages = [work_package]
         return jsonify([e.serialize() for e in work_packages])
 
-@app.route("/delete_work_package", methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/delete_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_work_package():
     job = request.json['job']
@@ -1094,7 +1094,7 @@ def delete_work_package():
         return jsonify([e.serialize() for e in work_packages])
 
 
-@app.route("/add_employee", methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/add_employee", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_employee():
     first_name = request.json['first_name']
@@ -1127,7 +1127,7 @@ def add_employee():
         employees = [employee]
         return jsonify([e.serialize() for e in employees])
 
-@app.route("/delete_employee", methods=["POST"], strict_slashes=False)
+@app.route("/flaskapi/delete_employee", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_employee():
     first_name = request.json['first_name']

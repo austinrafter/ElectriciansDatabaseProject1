@@ -1,6 +1,6 @@
 export default class APIServiceThirteen{
     static DeleteInventory(body){
-    return fetch('http://localhost:5000/delete_inventory',{
+    return fetch('http://localhost:5000/flaskapi/delete_inventory',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

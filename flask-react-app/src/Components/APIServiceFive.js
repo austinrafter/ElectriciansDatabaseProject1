@@ -1,6 +1,6 @@
 export default class APIServiceFive{
     static InsertJobName(body){
-    return fetch('http://localhost:5000/work_packages',{
+    return fetch('http://localhost:5000/flaskapi/work_packages',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

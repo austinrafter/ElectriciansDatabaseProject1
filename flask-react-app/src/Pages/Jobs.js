@@ -5,7 +5,7 @@ const Jobs = () => {
 const [jobs, setJobs] = useState([]);
 
 useEffect(()=>{
-      fetch('http://localhost:5000/jobs',{
+      fetch('http://localhost:5000/flaskapi/jobs',{
         'methods':'GET',
         headers : {
           'Content-Type':'application/json'

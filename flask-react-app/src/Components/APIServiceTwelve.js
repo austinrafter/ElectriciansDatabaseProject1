@@ -1,6 +1,6 @@
 export default class APIServiceTwelve{
     static InsertInventory(body){
-    return fetch('http://localhost:5000/add_inventory',{
+    return fetch('http://localhost:5000/flaskapi/add_inventory',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},
