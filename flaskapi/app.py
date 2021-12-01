@@ -404,10 +404,9 @@ def delete_from_job_site(location_name, site_name, start_date):
     location = cursor.fetchone()
     if location == None:
         return False
-    else:
-        cursor.execute("DELETE FROM JOB_SITE WHERE SITE_NAME = %s AND LOCATION_ID = %s AND START_DATE = %s;", [site_name, location[0],start_date])
-        conn.commit()
-        return True
+    cursor.execute("DELETE FROM JOB_SITE WHERE SITE_NAME = %s AND LOCATION_ID = %s AND START_DATE = %s;", [site_name, location[0],start_date])
+    conn.commit()
+    return True
 
 
 
