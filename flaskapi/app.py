@@ -450,11 +450,11 @@ def insert_into_electrician(first_name,last_name,Address,city,state,zipcode, yea
     cursor.execute("SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s ", [first_name,last_name,Address,city_state_zip[0]])
     person = cursor.fetchone()
     insert_into_position(position_name)
-    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = ?", [position_name])
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
     cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN WHERE PERSON_ID = %s AND POSITION_ID = %s AND YEARS_EMPLOYED = %s AND HOURLY_RATE = %s;",[person[0], position[0], years_employed, hourly_rate])
     electrician = cursor.fetchone()
-    if electrician[0] == None:
+    if electrician == None:
         cursor.execute("INSERT INTO ELECTRICIAN(PERSON_ID,POSITION_ID,YEARS_EMPLOYED, HOURLY_RATE) VALUES (%s, %s, %s, %s);", [person[0],position[0],years_employed,hourly_rate])
         conn.commit()
 
