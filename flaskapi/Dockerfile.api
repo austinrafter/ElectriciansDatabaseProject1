@@ -1,0 +1,9 @@
+FROM python:3.9
+WORKDIR /app
+
+COPY flaskapi/requirements.txt flaskapi/app.py flaskapi/models.py flaskapi/.flaskenv ./
+RUN pip3 install -r ./requirements.txt
+ENV FLASK_ENV production
+
+EXPOSE 5000
+CMD ["waitress-serve", "--listen", "127.0.0.1:5000", "app:app"]

@@ -9,13 +9,17 @@ from datetime import datetime
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://austin:ThisIsMyPassword@localhost/SJElectricDatabase'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:ThisIsMyPassword@localhost:3306/SJElectricDatabase'
+app.config['MYSQL_DATABASE_USER'] = 'austin'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'ThisIsMyPassword'
+app.config['MYSQL_DATABASE_DB'] = 'SJElectricianDatabase'
+app.config['MYSQL_DATABASE_HOST'] = 'db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 cors = CORS()
 
-engine = create_engine('mysql+mysqlconnector://austin:ThisIsMyPassword@localhost/SJElectricDatabase', echo = True)
+engine = create_engine('mysql+pymysql://root:ThisIsMyPassword@localhost:3306/SJElectricDatabase', echo = True)
 conn = engine.raw_connection()
 cursor = conn.cursor()
 

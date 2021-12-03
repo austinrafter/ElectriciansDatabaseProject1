@@ -1,0 +1,50 @@
+networks:
+  my_network_name:
+    name: my_network_name
+    external: false
+
+services:
+  db:
+    container_name: mysql_storage
+    image: mysql:latest
+    restart: always
+    volumes:
+      - './SQL-for-database:/release_sql_for_database:ro'
+    environment:
+      - "MYSQL_DATABASE= SJELectricDatabase"
+      - "MYSQL_ROOT_PASSWORD=ThisIsMyPassword"
+      - "MYSQL_PASSWORD=ThisIsMyPassword"
+    networks:
+      - my_network_name
+    ports:
+      - "32000:3306"
+  api:
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: flaskapi/Dockerfile.api
+    image: flask-react-app-api
+    environment:
+      - "DB_HOST=db"
+      - "DB_USER=root"
+      - "DB_PASSWORD=ThisIsMyPassword"
+      - "DB_NAME=SJELectricDatabase"
+      - "DB_PORT=3306"
+      - "CLIENT_ORIGIN=http://127.0.0.1:8888"
+    networks:
+      - my_network_name
+    volumes:
+      - .:/ThisIsMyPassword
+  client:
+    build:
+      context: .
+      dockerfile: flask-react-app/Dockerfile.client
+    image: flask-react-app-client
+    networks:
+      - my_network_name
+    ports:
+      - "3000:80"
+# Names our volume
+volumes:
+  SQL-for-database:
