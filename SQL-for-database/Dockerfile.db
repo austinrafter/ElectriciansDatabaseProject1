@@ -1,3 +1,2 @@
 FROM mysql:latest
-COPY  SQL-for-database/release_sql_for_database.sql C:\Users\Austin\PycharmProjects\ElectriciansDatabaseProject1\SQL-for-database\release_sql_for_database.sql
-RUN  SQL-for-database/release_sql_for_database.sql C:\Users\Austin\PycharmProjects\ElectriciansDatabaseProject1\SQL-for-database\release_sql_for_database.sql
+COPY  SQL-for-database/release_sql_for_database.sql /docker-entrypoint-initdb.d

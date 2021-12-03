@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS SJElectricDatabase;
+CREATE DATABASE IF NOT EXISTS SJElectricDatabase;
 
 USE SJElectricDatabase;
 
