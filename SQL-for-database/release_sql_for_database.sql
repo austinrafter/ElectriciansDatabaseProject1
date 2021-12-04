@@ -1,3 +1,5 @@
+ALTER USER 'root'@'localhost' IDENTIFIED WITH sha256_password BY 'ThisIsMyPassword';
+
 CREATE DATABASE IF NOT EXISTS SJElectricDatabase;
 
 USE SJElectricDatabase;
