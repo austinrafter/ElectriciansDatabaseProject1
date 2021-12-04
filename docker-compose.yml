@@ -4,7 +4,7 @@ services:
     image: mysql:latest
     platform: linux/x86_64
     volumes:
-      - "~/PycharmProjects/ElectriciansDatabaseProject1/SQL-for-database:/docker-entrypoint-initdb.d/release_sql_for_database.sql"
+      - "~/PycharmProjects/ElectriciansDatabaseProject1/SQL-for-database/release_sql_for_database.sql:/docker-entrypoint-initdb.d/release_sql_for_database.sql"
     restart: always
     environment:
       - "MYSQL_DATABASE=SJELectricDatabase"
