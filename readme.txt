@@ -8,8 +8,7 @@ Instructions to run through Docker
 6.Move to the directory containing ElectriciansDatabaseProject1 min your machine
         a.The command to move through directories is ‘cd /path/to/the/project/ElectriciansDatabaseProject1’ where ‘/path/to/the/project/ElectriciansDatabaseProject1’ is the full path to the ElectriciansDatabaseProject1 directory on your machine
 7. Enter ‘docker-compose up --build’ and press enter (note: Docker sometimes has an error that is closing the database after opening the first time which doesn’t allow the flask portion to read from or write to it.)
-              a.If the jobs, inventory, or electricians lists do not show when clicking the links and the terminal you ran the command is still up
-               press ctrl-c, 3 times in the terminal you ran the command in re-enter ‘docker-compose up --build’ and press enter in the same terminal
+              a.If the jobs, inventory, or electricians lists do not show when clicking the links and the terminal you ran the command is still up press ctrl-c, 3 times in the terminal you ran the command in re-enter ‘docker-compose up --build’ and press enter in the same terminal
               b.If the jobs, inventory, or electricians lists do not show when clicking the links and you have already closed the terminal
                       I.Open a terminal
                       II.Enter  ‘cd /path/to/the/project/ElectriciansDatabaseProject1’ and press enter
