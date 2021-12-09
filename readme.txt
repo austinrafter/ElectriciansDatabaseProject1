@@ -13,5 +13,5 @@ Instructions to run through Docker
                       I.Open a terminal
                       II.Enter  ‘cd /path/to/the/project/ElectriciansDatabaseProject1’ and press enter
                       III.Enter ‘docker-compose stop’ and press enter
-                      IV.Enter ‘docker-compose up --build’ and press enter
+                      IV.Enter ‘docker-compose up’ and press enter
 8.The program should run on localhost:3000 in the browser and may take a few minutes to build
