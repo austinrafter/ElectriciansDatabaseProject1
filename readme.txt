@@ -15,3 +15,4 @@ Instructions to run through Docker
                       III.Enter ‘docker-compose stop’ and press enter
                       IV.Enter ‘docker-compose up’ and press enter
 8.The program should run on localhost:3000 in the browser and may take a few minutes to build
+9.Any subsequent runs should use 'docker-compose up' instead of 'docker-compose up --build' when performing the start up command on your machine
