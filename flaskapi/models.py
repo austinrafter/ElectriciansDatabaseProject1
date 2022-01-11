@@ -268,6 +268,20 @@ class ElectricianOnWorkPackage():
 
         }
 
+class User():
+    user_id = 0
+    user_name = ''
+
+    def __init__(self, user_id, user_name):
+        self.user_id = user_id
+        self.user_name = user_name
+
+    def serialize(self):
+        return {
+            'user_id': self.user_id,
+            'user_name': self.user_name,
+
+        }
 
 
 

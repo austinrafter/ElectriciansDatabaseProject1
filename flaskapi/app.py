@@ -1,10 +1,12 @@
 from flask import request
-from flask import Flask, jsonify
+from flask import Flask, jsonify, session
 from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
-from models import Jobs, WorkPackages, Employees, Foreman, ProjectManager, GeneralManager, Inventory, MaterialInWorkPackage, ElectricianOnWorkPackage
+from models import Jobs, WorkPackages, Employees, Foreman, ProjectManager, GeneralManager, Inventory, MaterialInWorkPackage, ElectricianOnWorkPackage, User
 from datetime import datetime
+import hashlib
+import os
 
 
 
@@ -16,12 +18,119 @@ app.config['MYSQL_DATABASE_DB'] = 'SJElectricianDatabase'
 app.config['MYSQL_DATABASE_HOST'] = 'db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+app.secret_key = 'ksjjshkdfjkhgsdjklhfalkjshdeflakjshdfkuhsadfjhglkjdfhsglksjhdfkljghdfkjghaehrglkdsjfhgadrlkjfghdkfgldjfsg'
 
 cors = CORS()
 
 engine = create_engine('mysql+pymysql://root:ThisIsMyPassword@db:3306/SJElectricDatabase', echo = True)
 conn = engine.raw_connection()
 cursor = conn.cursor()
+
+def hash_password(salt, password):
+   key = hashlib.pbkdf2_hmac(
+       'sha256',
+       password.encode('utf-8'),
+       salt,
+       100000,
+       dklen=128 )
+   return key
+
+@app.route("/flaskapi/add_user" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def add_user():
+    username = request.json['username']
+    password = request.json['password']
+    first_name = request.json['first_name']
+    last_name = request.json['last_name']
+    position_name = request.json['position_name']
+    address = request.json['address']
+    city = request.json['city']
+    state = request.json['state']
+    zipcode = request.json['zipcode']
+
+    cursor.execute("SELECT USER_ID FROM USER WHERE USER_NAME=%s", [username])
+    user_exists = cursor.fetchone()
+    if user_exists != None:
+        user = User(0,"that username already exists")
+        return jsonify([e.serialize() for e in user])
+    salt = os.random(32)
+    hashed_pass = hash_password(salt,password)
+    cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s",
+                   [city, state, zipcode])
+    city_state_zip = cursor.fetchone()
+    if city_state_zip == None:
+        user = User(1, "that city state or zip does not exist")
+        return jsonify([e.serialize() for e in user])
+    cursor.execute(
+        "SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s",
+        [first_name, last_name, address, city_state_zip[0]])
+    person = cursor.fetchone()
+    if person == None:
+        user = User(1, "that person does not exist")
+        return jsonify([e.serialize() for e in user])
+    cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
+    position = cursor.fetchone()
+    if position == None:
+        user = User(1, "that position does not exist")
+        return jsonify([e.serialize() for e in user])
+    cursor.execute("SELECT SALARIED_EMPLOYEE_ID FROM SALARIED_EMPLOYEE WHERE POSITION_ID = %s AND PERSON_ID = %s", [position, person])
+    salaried_employee_id =  cursor.fetchone()
+    if salaried_employee_id == None:
+        user = User(1, "that employee does not exist")
+        return jsonify([e.serialize() for e in user])
+    cursor.execute("INSERT INTO USER (SALARIED_EMPLOYEE_ID,USER_NAME,PASS_WORD,SALT) VALUES (%s,%s,%s,%s)", [salaried_employee_id,username,hashed_pass,salt])
+    session['loggedin'] = True
+    session['username'] = username
+    session['position'] = position
+    user = User(1, username)
+    return jsonify([e.serialize() for e in user])
+
+@app.route("/flaskapi/login_user" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def login_user():
+    username = request.json['username']
+    password = request.json['password']
+    cursor.execute("SELECT USER_ID FROM USER WHERE USER_NAME=%s", [username])
+    user_exists = cursor.fetchone()
+    if user_exists == None:
+        user = User(0, "that username does not exist")
+        return jsonify([e.serialize() for e in user])
+
+    cursor.execute("SELECT SALT FROM USER WHERE USER_NAME = %s", [username])
+    salt = cursor.fetchone()
+
+    cursor.execute("SELECT PASS_WORD FROM USER WHERE USER_NAME = %s", [username])
+    hashed_pass = cursor.fetchone()
+
+    checked_pass = hash_password(salt,password)
+    if hashed_pass != checked_pass:
+        user = User(1, "that password is not correct")
+        return jsonify([e.serialize() for e in user])
+
+    cursor.execute("SELECT SALARIED_EMPLOYEE_ID FROM USER WHERE USER_NAME = %s", [username])
+    salaried_employee = cursor.fetchone()
+
+    cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE SALARIED_EMPLOYEE_ID = %s", [salaried_employee])
+    position_id = cursor.fetchone()
+
+    cursor.execute("SELECT POSITION_NAME FROM EMPLOYEE_POSITION WHERE POSITION_ID = %s", [position_id])
+    position = cursor.fetchone()
+
+    session['loggedin'] = True
+    session['username'] = username
+    session['position'] = position
+    user = User(1, username)
+    return jsonify([e.serialize() for e in user])
+
+@app.route("/flaskapi/logout_user" , methods=["POST"], strict_slashes=False)
+@cross_origin()
+def logout_user():
+    session.pop('loggedin', None)
+    session.pop('username', None)
+    session.pop('position', None)
+    user = User(1, "logged out")
+    return jsonify([e.serialize() for e in user])
+
 
 def check_user_position_foreman(first_name,last_name,Address,city,state,zipcode,position_name, job_to_view):
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s", [city,state,zipcode])
@@ -136,91 +245,59 @@ def position_check_gm(first_name,last_name,Address,city,state,zipcode,position_n
 @app.route("/flaskapi/foreman" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def foreman():
-    first_name = request.json['first_name']
-    print(first_name)
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zip']
-    years_employed = request.json['years_employed']
-    print(years_employed)
-    pay_rate = request.json['pay_rate']
-    job_to_view = request.json['job_to_view']
-    print(position)
-    foreman = check_user_position_foreman(first_name,last_name,address,city,state,zipcode,position, job_to_view)
-    print(foreman)
-    return jsonify([e.serialize() for e in foreman])
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and position == 'foreman':
+        job_to_view = request.json['job_to_view']
+        foreman =  get_foreman_view(job_to_view)
+        return jsonify([e.serialize() for e in foreman])
+    else:
+        foreman = [Foreman("not logged in as foreman","not logged in as foreman","not logged in as foreman","not logged in as foreman",1)]
+        return jsonify([e.serialize() for e in foreman])
 
 @app.route("/flaskapi/project_manager" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def project_manager():
-    first_name = request.json['first_name']
-    print(first_name)
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zip']
-    years_employed = request.json['years_employed']
-    print(years_employed)
-    pay_rate = request.json['pay_rate']
-    job_to_view = request.json['job_to_view']
-    print(position)
-    #employee = Employees(first_name, last_name, address, city, state, zipcode, position, pay_rate, years_employed,)
-
-    project_manager = check_user_position_project_manager(first_name, last_name, address, city, state, zipcode, position, job_to_view)
-    print(project_manager)
-    return jsonify([e.serialize() for e in project_manager])
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and position == 'project manager':
+        job_to_view = request.json['job_to_view']
+        project_manager = get_project_manager_view(job_to_view)
+        return jsonify([e.serialize() for e in project_manager])
+    else:
+        project_manager = [ProjectManager(1,"you are not logged in as a project manager and can't view that",0,0,0,0,0,0)]
+        return jsonify([e.serialize() for e in project_manager])
 
 
 @app.route("/flaskapi/general_manager" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def general_manager():
-    first_name = request.json['first_name']
-    print(first_name)
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zip']
-    years_employed = request.json['years_employed']
-    print(years_employed)
-    pay_rate = request.json['pay_rate']
-    job_to_view = request.json['job_to_view']
-    print(position)
-
-    general_manager = check_user_position_general_manager(first_name, last_name, address, city, state, zipcode, position, job_to_view)
-    return jsonify([e.serialize() for e in general_manager])
-
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and position == 'general manager':
+        job_to_view = request.json['job_to_view']
+        general_manager = get_general_manager_view(job_to_view)
+        return jsonify([e.serialize() for e in general_manager])
+    else:
+        general_manager = [GeneralManager(1,"You arent logged in as a general manager and cannot view that",0,0,0,0)]
+        return jsonify([e.serialize() for e in general_manager])
 
 
 @app.route("/flaskapi/hours_used" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def change_hours_used_on_work_package():
-    job = request.json['job']
-    work_package_name = request.json['work_package_name']
-    hours_used = request.json['hours_used']
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zip']
-    years_employed = request.json['years_employed']
-    foreman = position_check_fm(first_name,last_name,position,address,city,state,zipcode,years_employed)
-    if foreman:
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'foreman'):
+        job = request.json['job']
+        work_package_name = request.json['work_package_name']
+        hours_used = request.json['hours_used']
         cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME=?", [job])
         job_id = cursor.fetchone();
         cursor.execute("UPDATE WORK_PACKAGE SET HOURS_USED = ? WHERE WORK_PACKAGE_NAME = ? AND JOB_SITE_ID = ?", [hours_used,work_package_name, job_id[0]])
         conn.commit()
         return jsonify(hours_used)
-    else:
-        return False
+
 
 @app.route("/flaskapi/material_amount_used" , methods=["POST"], strict_slashes=False)
 @cross_origin()
@@ -241,24 +318,15 @@ def change_material_amount_used_in_work_package():
 @app.route("/flaskapi/add_inventory" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_inventory():
-    material_name = request.json['material_name']
-    cost_per_unit = request.json['cost_per_unit']
-    weight_per_unit = request.json['weight_per_unit']
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    years_employed = request.json['years_employed']
-    if position == 'Project Manager':
-        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
-    elif position == 'Foreman':
-        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
-    if upper_management:
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'foreman' or position == 'project aanager'):
+        material_name = request.json['material_name']
+        cost_per_unit = request.json['cost_per_unit']
+        weight_per_unit = request.json['weight_per_unit']
+
         cursor.execute("INSERT INTO INVENTORY (MATERIAL_NAME,COST_PER_UNIT,WEIGHT_PER_UNIT) VALUES (%s,%s,%s);",
-                       [material_name, cost_per_unit, weight_per_unit])
+                           [material_name, cost_per_unit, weight_per_unit])
         conn.commit()
         inventory = Inventory(1,material_name, cost_per_unit, weight_per_unit)
         inventorys = [inventory]
@@ -272,22 +340,12 @@ def add_inventory():
 @app.route("/flaskapi/delete_inventory" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_from_inventory():
-    material_name = request.json['material_name']
-    cost_per_unit = request.json['cost_per_unit']
-    weight_per_unit = request.json['weight_per_unit']
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    years_employed = request.json['years_employed']
-    if position == 'Project Manager':
-        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
-    elif position == 'Foreman':
-        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
-    if upper_management:
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+        material_name = request.json['material_name']
+        cost_per_unit = request.json['cost_per_unit']
+        weight_per_unit = request.json['weight_per_unit']
         cursor.execute("SELECT MATERIAL_NAME FROM INVENTORY WHERE MATERIAL_NAME = %s", [material_name])
         material = cursor.fetchone()
         if material[0] == None:
@@ -516,24 +574,16 @@ def delete_from_salaried_employee(first_name,last_name,Address,city,state,zipcod
 @app.route("/flaskapi/add_electrician_to_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_electrician_to_work_package():
-    electricians_first_name = request.json['electricians_first_name']
-    electricians_last_name = request.json['electricians_last_name']
-    electricians_position = request.json['electricians_position']
-    electricians_address = request.json['electricians_address']
-    work_package_name = request.json['work_package_name']
-    site_name = request.json['site_name']
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    if position == 'Project Manager':
-        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
-    elif position == 'Foreman':
-        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
-    if upper_management:
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+        electricians_first_name = request.json['electricians_first_name']
+        electricians_last_name = request.json['electricians_last_name']
+        electricians_position = request.json['electricians_position']
+        electricians_address = request.json['electricians_address']
+        work_package_name = request.json['work_package_name']
+        site_name = request.json['site_name']
+
         insert_into_position(electricians_position)
         cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [electricians_position])
         position = cursor.fetchone()
@@ -548,44 +598,44 @@ def add_electrician_to_work_package():
         person = cursor.fetchone()
         if person == None:
             inventory = ElectricianOnWorkPackage(1, "This person is not in our system",
-                                                 "This person is not in our system",
-                                                 "This person is not in our system",
-                                                "This person is not in our system")
+                                                    "This person is not in our system",
+                                                    "This person is not in our system",
+                                                    "This person is not in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
         cursor.execute("SELECT ELECTRICIAN_ID FROM ELECTRICIAN WHERE PERSON_ID = %s AND POSITION_ID = %s", [person[0],position[0]])
         electrician = cursor.fetchone()
         if electrician == None:
             inventory = ElectricianOnWorkPackage(1, "This electrician is not in our system",
-                                                 "This electrician is not in our system",
-                                                 "This electrician is not in our system",
-                                                 "This electrician is not in our system")
+                                                     "This electrician is not in our system",
+                                                     "This electrician is not in our system",
+                                                     "This electrician is not in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
         cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [site_name])
         job_site = cursor.fetchone()
         if job_site == None:
             inventory = ElectricianOnWorkPackage(1, "This job is not in our system",
-                                                 "This job is not in our system",
-                                                 "This job is not in our system",
-                                                 "This job is not in our system")
+                                                     "This job is not in our system",
+                                                     "This job is not in our system",
+                                                     "This job is not in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
         cursor.execute("SELECT WORK_PACKAGE_ID FROM WORK_PACKAGE WHERE WORK_PACKAGE_NAME = %s AND JOB_SITE_ID = %s", [work_package_name,job_site[0]])
         work_package = cursor.fetchone()
         if work_package == None:
             inventory = ElectricianOnWorkPackage(1, "This work package is not in our system",
-                                                 "This work package is not in our system",
-                                                 "This work package is not in our system",
-                                                 "This work package is not in our system")
+                                                     "This work package is not in our system",
+                                                     "This work package is not in our system",
+                                                     "This work package is not in our system")
             inventorys = [inventory]
             return jsonify([e.serialize() for e in inventorys])
         cursor.execute("INSERT INTO ELECTRICIAN_ON_WORK_PACKAGE(ELECTRICIAN_ID,WORK_PACKAGE_ID) VALUES (%s,%s);", [electrician[0],work_package[0]])
         conn.commit()
         inventory = ElectricianOnWorkPackage(1, electricians_first_name,
-                                             electricians_last_name,
-                                             work_package_name,
-                                             site_name)
+                                                 electricians_last_name,
+                                                 work_package_name,
+                                                 site_name)
         inventorys = [inventory]
         return jsonify([e.serialize() for e in inventorys])
     else:
@@ -596,24 +646,15 @@ def add_electrician_to_work_package():
 @app.route("/flaskapi/delete_electrician_from_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_electrician_from_work_package():
-    electricians_first_name = request.json['electricians_first_name']
-    electricians_last_name = request.json['electricians_last_name']
-    electricians_position = request.json['electricians_position']
-    electricians_address = request.json['electricians_address']
-    work_package_name = request.json['work_package_name']
-    site_name = request.json['site_name']
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    if position == 'Project Manager':
-        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
-    elif position == 'Foreman':
-        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
-    if upper_management:
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+        electricians_first_name = request.json['electricians_first_name']
+        electricians_last_name = request.json['electricians_last_name']
+        electricians_position = request.json['electricians_position']
+        electricians_address = request.json['electricians_address']
+        work_package_name = request.json['work_package_name']
+        site_name = request.json['site_name']
         insert_into_position(electricians_position)
         cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [electricians_position])
         position = cursor.fetchone()
@@ -685,23 +726,15 @@ def delete_electrician_from_work_package():
 @app.route("/flaskapi/insert_material_in_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def insert_material_in_work_package():
-    material_name = request.json['material_name']
-    work_package_name = request.json['work_package_name']
-    site_name = request.json['site_name']
-    amount_alloted = request.json['amount_alloted']
-    amount_used = request.json['amount_used']
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    if position == 'Project Manager':
-        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
-    elif position == 'Foreman':
-        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
-    if upper_management:
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+        material_name = request.json['material_name']
+        work_package_name = request.json['work_package_name']
+        site_name = request.json['site_name']
+        amount_alloted = request.json['amount_alloted']
+        amount_used = request.json['amount_used']
+
         cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [site_name])
         job_site = cursor.fetchone()
         print(job_site)
@@ -746,23 +779,14 @@ def insert_material_in_work_package():
 @app.route("/flaskapi/delete_material_in_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_material_in_work_package():
-    material_name = request.json['material_name']
-    work_package_name = request.json['work_package_name']
-    site_name = request.json['site_name']
-    amount_alloted = request.json['amount_alloted']
-    amount_used = request.json['amount_used']
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    if position == 'Project Manager':
-        upper_management = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
-    elif position == 'Foreman':
-        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
-    if upper_management:
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+        material_name = request.json['material_name']
+        work_package_name = request.json['work_package_name']
+        site_name = request.json['site_name']
+        amount_alloted = request.json['amount_alloted']
+        amount_used = request.json['amount_used']
         cursor.execute("SELECT JOB_SITE_ID FROM JOB_SITE WHERE SITE_NAME = %s", [site_name])
         job_site = cursor.fetchone()
         if job_site == None:
@@ -1006,19 +1030,13 @@ def delete_job():
 @app.route("/flaskapi/add_job", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_job():
-    location = request.json['location']
-    site_name = request.json['site_name']
-    start_date = request.json['start_date']
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'general manager'):
+        location = request.json['location']
+        site_name = request.json['site_name']
+        start_date = request.json['start_date']
 
-    general_manager = position_check_pm(first_name, last_name, address, city, state, zipcode, position)
-    if general_manager:
         insert_into_location(location)
         insert_into_job_site(location, site_name, start_date)
         job = Jobs(1,start_date,site_name,location)
@@ -1032,31 +1050,22 @@ def add_job():
 @app.route("/flaskapi/add_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_work_package():
-    job = request.json['job']
-    work_package_name = request.json['work_package_name']
-    price_of_work = request.json['price_of_work']
-    hours_alloted = request.json['hours_alloted']
-    hours_used = request.json['hours_used']
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    years_employed = request.json['years_employed']
-    if position == 'Project Manager':
-      upper_management =  position_check_pm(first_name,last_name,address,city,state,zipcode, position)
-    elif position == 'Foreman':
-        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
-    if upper_management:
-        work_p = insert_into_work_package(job, work_package_name, price_of_work, hours_alloted, hours_used)
-        if work_p == False:
-            work_package = WorkPackages(1, "that is not a job to add to", "that is not a job to add to", 1, 1, 1)
-        else:
-            work_package = WorkPackages(1,job,work_package_name,price_of_work,hours_alloted,hours_used)
-        work_packages = [work_package]
-        return jsonify([e.serialize() for e in work_packages])
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+        job = request.json['job']
+        work_package_name = request.json['work_package_name']
+        price_of_work = request.json['price_of_work']
+        hours_alloted = request.json['hours_alloted']
+        hours_used = request.json['hours_used']
+
+         work_p = insert_into_work_package(job, work_package_name, price_of_work, hours_alloted, hours_used)
+         if work_p == False:
+             work_package = WorkPackages(1, "that is not a job to add to", "that is not a job to add to", 1, 1, 1)
+         else:
+             work_package = WorkPackages(1,job,work_package_name,price_of_work,hours_alloted,hours_used)
+         work_packages = [work_package]
+         return jsonify([e.serialize() for e in work_packages])
     else:
         work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", price_of_work, hours_alloted, hours_used)
         work_packages = [work_package]
@@ -1065,24 +1074,14 @@ def add_work_package():
 @app.route("/flaskapi/delete_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_work_package():
-    job = request.json['job']
-    work_package_name = request.json['work_package_name']
-    price_of_work = request.json['price_of_work']
-    hours_alloted = request.json['hours_alloted']
-    hours_used = request.json['hours_used']
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    years_employed = request.json['years_employed']
-    if position == 'Project Manager':
-      upper_management =  position_check_pm(first_name,last_name,address,city,state,zipcode, position)
-    elif position == 'Foreman':
-        upper_management = position_check_fm(first_name, last_name, address, city, state, zipcode, position)
-    if upper_management:
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+        job = request.json['job']
+        work_package_name = request.json['work_package_name']
+        price_of_work = request.json['price_of_work']
+        hours_alloted = request.json['hours_alloted']
+        hours_used = request.json['hours_used']
         work = delete_from_work_package(job, work_package_name, price_of_work, hours_alloted, hours_used)
         if work == False:
             work_package = WorkPackages(1,"that is not a work package for this job","that is not a work package for this job",price_of_work,hours_alloted,hours_used)
@@ -1101,24 +1100,19 @@ def delete_work_package():
 @app.route("/flaskapi/add_employee", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_employee():
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    years_employed = request.json['years_employed']
-    pay_rate = request.json['pay_rate']
-    first_name_gm = request.json['first_name_gm']
-    last_name_gm = request.json['last_name_gm']
-    position_gm = request.json['position_gm']
-    address_gm = request.json['address_gm']
-    city_gm = request.json['city_gm']
-    state_gm = request.json['state_gm']
-    zipcode_gm = request.json['zipcode_gm']
-    general_man = position_check_gm(first_name_gm,last_name_gm,address_gm,city_gm,state_gm,zipcode_gm,position_gm)
-    if general_man:
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'general manager'):
+        first_name = request.json['first_name']
+        last_name = request.json['last_name']
+        position = request.json['position']
+        address = request.json['address']
+        city = request.json['city']
+        state = request.json['state']
+        zipcode = request.json['zipcode']
+        years_employed = request.json['years_employed']
+        pay_rate = request.json['pay_rate']
+
         if (position == "Inside Wireman") or (position == "Residential Wireman"):
           insert_into_electrician(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
         else:
@@ -1134,24 +1128,18 @@ def add_employee():
 @app.route("/flaskapi/delete_employee", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_employee():
-    first_name = request.json['first_name']
-    last_name = request.json['last_name']
-    position = request.json['position']
-    address = request.json['address']
-    city = request.json['city']
-    state = request.json['state']
-    zipcode = request.json['zipcode']
-    years_employed = request.json['years_employed']
-    pay_rate = request.json['pay_rate']
-    first_name_gm = request.json['first_name_gm']
-    last_name_gm = request.json['last_name_gm']
-    position_gm = request.json['position_gm']
-    address_gm = request.json['address_gm']
-    city_gm = request.json['city_gm']
-    state_gm = request.json['state_gm']
-    zipcode_gm = request.json['zipcode_gm']
-    general_man = position_check_gm(first_name_gm,last_name_gm,address_gm,city_gm,state_gm,zipcode_gm,position_gm)
-    if general_man:
+    loggedIn = session['loggedin']
+    position = session['position']
+    if loggedIn == True and (position == 'general manager'):
+        first_name = request.json['first_name']
+        last_name = request.json['last_name']
+        position = request.json['position']
+        address = request.json['address']
+        city = request.json['city']
+        state = request.json['state']
+        zipcode = request.json['zipcode']
+        years_employed = request.json['years_employed']
+        pay_rate = request.json['pay_rate']
         if (position == "Inside Wireman") or (position == "Residential Wireman"):
           electrician = delete_from_electrician(first_name,last_name,address,city,state,zipcode, years_employed, pay_rate, position)
           if electrician == False:
