@@ -14,20 +14,11 @@ const AddMaterialToWorkPackage = (props) => {
     const [site_name, setSiteName] = useState('')
     const [amount_alloted, setAmountAlloted] = useState('')
     const [amount_used, setAmountUsed] = useState('')
-    const [first_name, setFirstName] = useState('')
-    const [last_name, setLastName] = useState('')
-    const [address, setAddress] = useState('')
-    const [city, setCity] = useState('')
-    const [state, setState] = useState('')
-    const [zipcode, setZip] = useState('')
-    const [position, setPosition] = useState('')
-    const [pay_rate, setPayRate] = useState('')
-    const [years_employed, setYearsEmployed] = useState('')
     const [general_managers, setGeneralManagers] = useState([]);
     const [materials_on_packages, setMaterialsOnPackages] = useState([]);
 
     const checkInventory = () =>{
-    APIServiceSixteen.InsertMaterialToWorkPackage({material_name,work_package_name,site_name,amount_alloted, amount_used,first_name,last_name,position,address,city,state,zipcode})
+    APIServiceSixteen.InsertMaterialToWorkPackage({material_name,work_package_name,site_name,amount_alloted, amount_used})
     .then((response) => setMaterialsOnPackages(response))
           .catch(error => console.log('error',error))
           }
@@ -40,15 +31,6 @@ const AddMaterialToWorkPackage = (props) => {
           setSiteName('')
           setAmountAlloted('')
           setAmountUsed('')
-          setFirstName('')
-          setLastName('')
-          setAddress('')
-          setCity('')
-          setState('')
-          setZip('')
-          setPosition('')
-          setPayRate('')
-          setYearsEmployed('')
         }
 
         const [showFormTwo, setShowFormTwo] = useState(false);
@@ -111,98 +93,6 @@ const AddMaterialToWorkPackage = (props) => {
                       onChange={(e)=>setAmountUsed(e.target.value)}
                       required
                       />
-
-                      <h3> "This section to confirm you are a foreman or project manager" </h3>
-
-                     <label htmlFor="first_name" className="form-label">First Name</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter first name"
-                     value={first_name}
-                     onChange={(e)=>setFirstName(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="last_name" className="form-label">Last Name</label>
-                      <input
-                      type="text"
-                      className="form-control"
-                      placeholder ="Enter last name"
-                      value={last_name}
-                      onChange={(e)=>setLastName(e.target.value)}
-                      required
-                      />
-
-                      <label htmlFor="address" className="form-label">Address</label>
-                      <input
-                      type="text"
-                      className="form-control"
-                      placeholder ="Enter address"
-                      value={address}
-                      onChange={(e)=>setAddress(e.target.value)}
-                      required
-                      />
-
-                       <label htmlFor="city" className="form-label">City</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter city"
-                     value={city}
-                     onChange={(e)=>setCity(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="state" className="form-label">State</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter state"
-                     value={state}
-                     onChange={(e)=>setState(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="zipcode" className="form-label">Zipcode</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter zip code"
-                     value={zipcode}
-                     onChange={(e)=>setZip(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="position" className="form-label">Position</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter position"
-                     value={position}
-                     onChange={(e)=>setPosition(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="pay_rate" className="form-label">Pay Rate</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter your pay rate"
-                     value={pay_rate}
-                     onChange={(e)=>setPayRate(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="years_employed" className="form-label">Years Employed</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter years employed"
-                     value={years_employed}
-                     onChange={(e)=>setYearsEmployed(e.target.value)}
-                     required
-                     />
 
 
                      <button

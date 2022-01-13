@@ -8,20 +8,11 @@ const Work_Package_Form = (props) => {
     const [price_of_work, setPriceOfWork] = useState('')
     const [hours_alloted, setHoursAlloted] = useState('')
     const [hours_used, setHoursUsed] = useState('')
-    const [first_name, setFirstName] = useState('')
-    const [last_name, setLastName] = useState('')
-    const [address, setAddress] = useState('')
-    const [city, setCity] = useState('')
-    const [state, setState] = useState('')
-    const [zipcode, setZip] = useState('')
-    const [position, setPosition] = useState('')
-    const [pay_rate, setPayRate] = useState('')
-    const [years_employed, setYearsEmployed] = useState('')
     const [job, setJob] = useState('')
     const [work_packages, setWorkPackages] = useState('')
 
     const insertWorkPackage = () =>{
-    APIServiceTwo.InsertWorkPackage({work_package_name, price_of_work, hours_alloted, hours_used, first_name,last_name, address, city, state, zipcode,position, pay_rate, years_employed, job})
+    APIServiceTwo.InsertWorkPackage({work_package_name, price_of_work, hours_alloted, hours_used, job})
     .then((response) => setWorkPackages(response))
           .catch(error => console.log('error',error))
           }
@@ -33,15 +24,6 @@ const Work_Package_Form = (props) => {
           setPriceOfWork('')
           setHoursAlloted('')
           setHoursUsed('')
-          setFirstName('')
-          setLastName('')
-          setAddress('')
-          setCity('')
-          setState('')
-          setZip('')
-          setPosition('')
-          setPayRate('')
-          setYearsEmployed('')
           setJob('')
 
         }
@@ -54,7 +36,7 @@ const Work_Package_Form = (props) => {
                      <input
                      type="text"
                      className="form-control"
-                     placeholder ="Enter job name"
+                     placeholder ="Enter work package name"
                      value={work_package_name}
                      onChange={(e)=>setWorkPackageName(e.target.value)}
                      required
@@ -97,98 +79,6 @@ const Work_Package_Form = (props) => {
                      placeholder ="Enter first name"
                      value={hours_alloted}
                      onChange={(e)=>setHoursAlloted(e.target.value)}
-                     required
-                     />
-
-                     <h2> "This section to confirm you are a Foreman or Project Manager in our system" </h2>
-
-                     <label htmlFor="first_name" className="form-label">PM or Foreman First Name</label>
-                      <input
-                      type="text"
-                      className="form-control"
-                      placeholder ="Enter last name"
-                      value={first_name}
-                      onChange={(e)=>setFirstName(e.target.value)}
-                      required
-                      />
-
-                      <label htmlFor="last_name" className="form-label">PM or Foreman Last Name</label>
-                      <input
-                      type="text"
-                      className="form-control"
-                      placeholder ="Enter last name"
-                      value={last_name}
-                      onChange={(e)=>setLastName(e.target.value)}
-                      required
-                      />
-
-                      <label htmlFor="address" className="form-label">PM or Foreman Address</label>
-                      <input
-                      type="text"
-                      className="form-control"
-                      placeholder ="Enter address"
-                      value={address}
-                      onChange={(e)=>setAddress(e.target.value)}
-                      required
-                      />
-
-                       <label htmlFor="city" className="form-label">PM or Foreman City</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter city"
-                     value={city}
-                     onChange={(e)=>setCity(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="state" className="form-label">PM or Foreman State</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter state"
-                     value={state}
-                     onChange={(e)=>setState(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="zipcode" className="form-label">PM or Foreman Zipcode</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter zip code"
-                     value={zipcode}
-                     onChange={(e)=>setZip(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="position" className="form-label">PM or Foreman Position</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter position"
-                     value={position}
-                     onChange={(e)=>setPosition(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="pay_rate" className="form-label">PM or Foreman Pay Rate</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter your pay rate"
-                     value={pay_rate}
-                     onChange={(e)=>setPayRate(e.target.value)}
-                     required
-                     />
-
-                      <label htmlFor="years_employed" className="form-label">PM or Foreman Years Employed</label>
-                     <input
-                     type="text"
-                     className="form-control"
-                     placeholder ="Enter years employed"
-                     value={years_employed}
-                     onChange={(e)=>setYearsEmployed(e.target.value)}
                      required
                      />
 
