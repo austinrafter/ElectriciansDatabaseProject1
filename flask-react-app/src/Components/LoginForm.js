@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import APIServiceEighteen from '../Components/ApiServiceEighteen.js'
+import APIServiceEighteen from '../Components/APIServiceEighteen.js'
 import UsersList from '../Components/UserList';
 
 
 const LoginForm = (props) => {
-    const [work_package_name, setWorkPackageName] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [users, setUsers] = useState('')
@@ -26,22 +25,22 @@ const LoginForm = (props) => {
            <div>
              <form onSubmit = {handleSubmit} >
                     <h2> "Enter username and password" </h2>
-                     <label htmlFor="work_package_name" className="form-label">Username</label>
+                     <label htmlFor="username" className="form-label">Username</label>
                      <input
                      type="text"
                      className="form-control"
                      placeholder ="Enter username"
-                     value={work_package_name}
+                     value={username}
                      onChange={(e)=>setUsername(e.target.value)}
                      required
                      />
 
-                      <label htmlFor="price_of_work" className="form-label">Password</label>
+                      <label htmlFor="password" className="form-label">Password</label>
                       <input
                       type="text"
                       className="form-control"
                       placeholder ="Enter password"
-                      value={price_of_work}
+                      value={password}
                       onChange={(e)=>setPassword(e.target.value)}
                       required
                       />
@@ -49,11 +48,11 @@ const LoginForm = (props) => {
                      <button
                      className="btn btn-primary mt-2"
                      >
-                     Add Work Package</button>
+                     Login</button>
 
                    </form>
                    <div>
-                <UserList users={users}/>
+                <UsersList users={users}/>
         </div>
            </div>
       )}

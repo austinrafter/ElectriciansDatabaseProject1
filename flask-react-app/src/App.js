@@ -7,6 +7,7 @@ import Jobs from "./Pages/Jobs";
 import Home from "./Pages/Home";
 import Inventory from "./Pages/Inventory";
 import Electricians from "./Pages/Electricians";
+import UserAuthentication from "./Pages/UserAuthentication";
 
 function App() {
 
@@ -17,6 +18,9 @@ function App() {
       <Router>
       <div>
         <Link to="/">Home</Link>
+      </div>
+      <div>
+        <Link to="/user_authentication">Login or Signup</Link>
       </div>
       <div>
         <Link to="/jobs">Jobs</Link>
@@ -41,6 +45,8 @@ function App() {
 
       <Routes>
       <Route path="/" element={<Home />}>
+        </Route>
+        <Route path="/user_authentication" element={<UserAuthentication />}>
         </Route>
         <Route path="/jobs" element={<Jobs />}>
         </Route>

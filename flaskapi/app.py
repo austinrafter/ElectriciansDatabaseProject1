@@ -48,7 +48,7 @@ def add_user():
     state = request.json['state']
     zipcode = request.json['zipcode']
 
-    cursor.execute("SELECT USER_ID FROM USER WHERE USER_NAME=%s", [username])
+    cursor.execute("SELECT USER_ID FROM SITE_USER WHERE USER_NAME=%s", [username])
     user_exists = cursor.fetchone()
     if user_exists != None:
         user = User(0,"that username already exists")
@@ -78,7 +78,7 @@ def add_user():
     if salaried_employee_id == None:
         user = User(1, "that employee does not exist")
         return jsonify([e.serialize() for e in user])
-    cursor.execute("INSERT INTO USER (SALARIED_EMPLOYEE_ID,USER_NAME,PASS_WORD,SALT) VALUES (%s,%s,%s,%s)", [salaried_employee_id,username,hashed_pass,salt])
+    cursor.execute("INSERT INTO SITE_USER (SALARIED_EMPLOYEE_ID,USER_NAME,PASS_WORD,SALT) VALUES (%s,%s,%s,%s)", [salaried_employee_id,username,hashed_pass,salt])
     session['loggedin'] = True
     session['username'] = username
     session['position'] = position
@@ -90,16 +90,16 @@ def add_user():
 def login_user():
     username = request.json['username']
     password = request.json['password']
-    cursor.execute("SELECT USER_ID FROM USER WHERE USER_NAME=%s", [username])
+    cursor.execute("SELECT USER_ID FROM SITE_USER WHERE USER_NAME=%s", [username])
     user_exists = cursor.fetchone()
     if user_exists == None:
         user = User(0, "that username does not exist")
         return jsonify([e.serialize() for e in user])
 
-    cursor.execute("SELECT SALT FROM USER WHERE USER_NAME = %s", [username])
+    cursor.execute("SELECT SALT FROM SITE_USER WHERE USER_NAME = %s", [username])
     salt = cursor.fetchone()
 
-    cursor.execute("SELECT PASS_WORD FROM USER WHERE USER_NAME = %s", [username])
+    cursor.execute("SELECT PASS_WORD FROM SITE_USER WHERE USER_NAME = %s", [username])
     hashed_pass = cursor.fetchone()
 
     checked_pass = hash_password(salt,password)
@@ -107,7 +107,7 @@ def login_user():
         user = User(1, "that password is not correct")
         return jsonify([e.serialize() for e in user])
 
-    cursor.execute("SELECT SALARIED_EMPLOYEE_ID FROM USER WHERE USER_NAME = %s", [username])
+    cursor.execute("SELECT SALARIED_EMPLOYEE_ID FROM SITE_USER WHERE USER_NAME = %s", [username])
     salaried_employee = cursor.fetchone()
 
     cursor.execute("SELECT POSITION_ID FROM SALARIED_EMPLOYEE WHERE SALARIED_EMPLOYEE_ID = %s", [salaried_employee])
@@ -247,7 +247,7 @@ def position_check_gm(first_name,last_name,Address,city,state,zipcode,position_n
 def foreman():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and position == 'foreman':
+    if loggedIn == True and position == 'Foreman':
         job_to_view = request.json['job_to_view']
         foreman =  get_foreman_view(job_to_view)
         return jsonify([e.serialize() for e in foreman])
@@ -260,7 +260,7 @@ def foreman():
 def project_manager():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and position == 'project manager':
+    if loggedIn == True and position == 'Project Manager':
         job_to_view = request.json['job_to_view']
         project_manager = get_project_manager_view(job_to_view)
         return jsonify([e.serialize() for e in project_manager])
@@ -274,7 +274,7 @@ def project_manager():
 def general_manager():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and position == 'general manager':
+    if loggedIn == True and position == 'General Manager':
         job_to_view = request.json['job_to_view']
         general_manager = get_general_manager_view(job_to_view)
         return jsonify([e.serialize() for e in general_manager])
@@ -288,7 +288,7 @@ def general_manager():
 def change_hours_used_on_work_package():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'foreman'):
+    if loggedIn == True and (position == 'Foreman'):
         job = request.json['job']
         work_package_name = request.json['work_package_name']
         hours_used = request.json['hours_used']
@@ -320,7 +320,7 @@ def change_material_amount_used_in_work_package():
 def add_inventory():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'foreman' or position == 'project aanager'):
+    if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         material_name = request.json['material_name']
         cost_per_unit = request.json['cost_per_unit']
         weight_per_unit = request.json['weight_per_unit']
@@ -342,7 +342,7 @@ def add_inventory():
 def delete_from_inventory():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+    if loggedIn == True and (position == 'Foreman' or position == 'Project manager'):
         material_name = request.json['material_name']
         cost_per_unit = request.json['cost_per_unit']
         weight_per_unit = request.json['weight_per_unit']
@@ -576,7 +576,7 @@ def delete_from_salaried_employee(first_name,last_name,Address,city,state,zipcod
 def add_electrician_to_work_package():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+    if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         electricians_first_name = request.json['electricians_first_name']
         electricians_last_name = request.json['electricians_last_name']
         electricians_position = request.json['electricians_position']
@@ -648,7 +648,7 @@ def add_electrician_to_work_package():
 def delete_electrician_from_work_package():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+    if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         electricians_first_name = request.json['electricians_first_name']
         electricians_last_name = request.json['electricians_last_name']
         electricians_position = request.json['electricians_position']
@@ -728,7 +728,7 @@ def delete_electrician_from_work_package():
 def insert_material_in_work_package():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+    if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         material_name = request.json['material_name']
         work_package_name = request.json['work_package_name']
         site_name = request.json['site_name']
@@ -781,7 +781,7 @@ def insert_material_in_work_package():
 def delete_material_in_work_package():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+    if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         material_name = request.json['material_name']
         work_package_name = request.json['work_package_name']
         site_name = request.json['site_name']
@@ -1032,7 +1032,7 @@ def delete_job():
 def add_job():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'general manager'):
+    if loggedIn == True and (position == 'General Manager'):
         location = request.json['location']
         site_name = request.json['site_name']
         start_date = request.json['start_date']
@@ -1052,20 +1052,20 @@ def add_job():
 def add_work_package():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+    if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         job = request.json['job']
         work_package_name = request.json['work_package_name']
         price_of_work = request.json['price_of_work']
         hours_alloted = request.json['hours_alloted']
         hours_used = request.json['hours_used']
 
-         work_p = insert_into_work_package(job, work_package_name, price_of_work, hours_alloted, hours_used)
-         if work_p == False:
-             work_package = WorkPackages(1, "that is not a job to add to", "that is not a job to add to", 1, 1, 1)
-         else:
-             work_package = WorkPackages(1,job,work_package_name,price_of_work,hours_alloted,hours_used)
-         work_packages = [work_package]
-         return jsonify([e.serialize() for e in work_packages])
+        work_p = insert_into_work_package(job, work_package_name, price_of_work, hours_alloted, hours_used)
+        if work_p == False:
+            work_package = WorkPackages(1, "that is not a job to add to", "that is not a job to add to", 1, 1, 1)
+        else:
+            work_package = WorkPackages(1,job,work_package_name,price_of_work,hours_alloted,hours_used)
+        work_packages = [work_package]
+        return jsonify([e.serialize() for e in work_packages])
     else:
         work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", price_of_work, hours_alloted, hours_used)
         work_packages = [work_package]
@@ -1076,7 +1076,7 @@ def add_work_package():
 def delete_work_package():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'foreman' or position == 'project manager'):
+    if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         job = request.json['job']
         work_package_name = request.json['work_package_name']
         price_of_work = request.json['price_of_work']
@@ -1102,7 +1102,7 @@ def delete_work_package():
 def add_employee():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'general manager'):
+    if loggedIn == True and (position == 'General Manager'):
         first_name = request.json['first_name']
         last_name = request.json['last_name']
         position = request.json['position']
@@ -1130,7 +1130,7 @@ def add_employee():
 def delete_employee():
     loggedIn = session['loggedin']
     position = session['position']
-    if loggedIn == True and (position == 'general manager'):
+    if loggedIn == True and (position == 'General Manager'):
         first_name = request.json['first_name']
         last_name = request.json['last_name']
         position = request.json['position']
