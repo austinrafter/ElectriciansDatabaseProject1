@@ -8,6 +8,7 @@ import Home from "./Pages/Home";
 import Inventory from "./Pages/Inventory";
 import Electricians from "./Pages/Electricians";
 import UserAuthentication from "./Pages/UserAuthentication";
+import LogoutForm from "./Components/LogoutButton";
 
 function App() {
 
@@ -40,6 +41,9 @@ function App() {
       <div>
         <Link to="/foreman">Foremen</Link>
       </div>
+      <div>
+        <Link to="/logout">Logout</Link>
+      </div>
 
       <hr />
 
@@ -59,6 +63,8 @@ function App() {
         <Route path="/project_manager" element={<Project_Manager />}>
         </Route>
         <Route path="/foreman" element={<Foreman />}>
+        </Route>
+        <Route path="/logout" element={<LogoutForm />}>
         </Route>
       </Routes>
     </Router>

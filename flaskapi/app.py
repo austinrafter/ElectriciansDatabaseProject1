@@ -59,29 +59,29 @@ def add_user():
                    [city, state, zipcode])
     city_state_zip = cursor.fetchone()
     if city_state_zip == None:
-        user = User(1, "that city state or zip does not exist")
+        user = User(1, "that city state or zip does not exist in our system")
         return jsonify([e.serialize() for e in user])
     cursor.execute(
         "SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s",
         [first_name, last_name, address, city_state_zip[0]])
     person = cursor.fetchone()
     if person == None:
-        user = User(1, "that person does not exist")
+        user = User(1, "that person does not exist in our system")
         return jsonify([e.serialize() for e in user])
     cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
     if position == None:
-        user = User(1, "that position does not exist")
+        user = User(1, "that position does not exist in our system")
         return jsonify([e.serialize() for e in user])
     cursor.execute("SELECT SALARIED_EMPLOYEE_ID FROM SALARIED_EMPLOYEE WHERE POSITION_ID = %s AND PERSON_ID = %s", [position, person])
     salaried_employee_id =  cursor.fetchone()
     if salaried_employee_id == None:
-        user = User(1, "that employee does not exist")
+        user = User(1, "that employee does not exist in our system")
         return jsonify([e.serialize() for e in user])
     cursor.execute("INSERT INTO SITE_USER (SALARIED_EMPLOYEE_ID,USER_NAME,PASS_WORD,SALT) VALUES (%s,%s,%s,%s)", [salaried_employee_id,username,hashed_pass,salt])
     session['loggedin'] = True
     session['username'] = username
-    session['position'] = position
+    session['position'] = position_name
     user = User(1, username)
     return jsonify([e.serialize() for e in user])
 
@@ -93,7 +93,7 @@ def login_user():
     cursor.execute("SELECT USER_ID FROM SITE_USER WHERE USER_NAME=%s", [username])
     user_exists = cursor.fetchone()
     if user_exists == None:
-        user = User(0, "that username does not exist")
+        user = User(0, "that username does not exist in our system")
         return jsonify([e.serialize() for e in user])
 
     cursor.execute("SELECT SALT FROM SITE_USER WHERE USER_NAME = %s", [username])
@@ -245,8 +245,9 @@ def position_check_gm(first_name,last_name,Address,city,state,zipcode,position_n
 @app.route("/flaskapi/foreman" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def foreman():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and position == 'Foreman':
         job_to_view = request.json['job_to_view']
         foreman =  get_foreman_view(job_to_view)
@@ -258,8 +259,9 @@ def foreman():
 @app.route("/flaskapi/project_manager" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def project_manager():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and position == 'Project Manager':
         job_to_view = request.json['job_to_view']
         project_manager = get_project_manager_view(job_to_view)
@@ -272,8 +274,9 @@ def project_manager():
 @app.route("/flaskapi/general_manager" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def general_manager():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and position == 'General Manager':
         job_to_view = request.json['job_to_view']
         general_manager = get_general_manager_view(job_to_view)
@@ -286,8 +289,9 @@ def general_manager():
 @app.route("/flaskapi/hours_used" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def change_hours_used_on_work_package():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'Foreman'):
         job = request.json['job']
         work_package_name = request.json['work_package_name']
@@ -318,8 +322,9 @@ def change_material_amount_used_in_work_package():
 @app.route("/flaskapi/add_inventory" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_inventory():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         material_name = request.json['material_name']
         cost_per_unit = request.json['cost_per_unit']
@@ -340,8 +345,9 @@ def add_inventory():
 @app.route("/flaskapi/delete_inventory" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_from_inventory():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'Foreman' or position == 'Project manager'):
         material_name = request.json['material_name']
         cost_per_unit = request.json['cost_per_unit']
@@ -574,8 +580,9 @@ def delete_from_salaried_employee(first_name,last_name,Address,city,state,zipcod
 @app.route("/flaskapi/add_electrician_to_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_electrician_to_work_package():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         electricians_first_name = request.json['electricians_first_name']
         electricians_last_name = request.json['electricians_last_name']
@@ -646,8 +653,9 @@ def add_electrician_to_work_package():
 @app.route("/flaskapi/delete_electrician_from_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_electrician_from_work_package():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         electricians_first_name = request.json['electricians_first_name']
         electricians_last_name = request.json['electricians_last_name']
@@ -726,8 +734,9 @@ def delete_electrician_from_work_package():
 @app.route("/flaskapi/insert_material_in_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def insert_material_in_work_package():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         material_name = request.json['material_name']
         work_package_name = request.json['work_package_name']
@@ -779,8 +788,9 @@ def insert_material_in_work_package():
 @app.route("/flaskapi/delete_material_in_work_package" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_material_in_work_package():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         material_name = request.json['material_name']
         work_package_name = request.json['work_package_name']
@@ -1030,8 +1040,9 @@ def delete_job():
 @app.route("/flaskapi/add_job", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_job():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'General Manager'):
         location = request.json['location']
         site_name = request.json['site_name']
@@ -1050,8 +1061,9 @@ def add_job():
 @app.route("/flaskapi/add_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_work_package():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         job = request.json['job']
         work_package_name = request.json['work_package_name']
@@ -1074,8 +1086,9 @@ def add_work_package():
 @app.route("/flaskapi/delete_work_package", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_work_package():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'Foreman' or position == 'Project Manager'):
         job = request.json['job']
         work_package_name = request.json['work_package_name']
@@ -1100,8 +1113,9 @@ def delete_work_package():
 @app.route("/flaskapi/add_employee", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_employee():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'General Manager'):
         first_name = request.json['first_name']
         last_name = request.json['last_name']
@@ -1128,8 +1142,9 @@ def add_employee():
 @app.route("/flaskapi/delete_employee", methods=["POST"], strict_slashes=False)
 @cross_origin()
 def delete_employee():
-    loggedIn = session['loggedin']
-    position = session['position']
+    if 'username' in session:
+        loggedIn = session['loggedin']
+        position = session['position']
     if loggedIn == True and (position == 'General Manager'):
         first_name = request.json['first_name']
         last_name = request.json['last_name']
