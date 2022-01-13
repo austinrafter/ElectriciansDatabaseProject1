@@ -35,6 +35,15 @@ def hash_password(salt, password):
        dklen=128 )
    return key
 
+def generate_salt(saltLength):
+    import random
+    ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    chars = []
+    for i in range(saltLength):
+        chars.append(random.choice(ALPHABET))
+
+    "".join(chars)
+
 @app.route("/flaskapi/add_user" , methods=["POST"], strict_slashes=False)
 @cross_origin()
 def add_user():
@@ -51,38 +60,39 @@ def add_user():
     cursor.execute("SELECT USER_ID FROM SITE_USER WHERE USER_NAME=%s", [username])
     user_exists = cursor.fetchone()
     if user_exists != None:
-        user = User(0,"that username already exists")
+        user = [User(0,"that username already exists")]
         return jsonify([e.serialize() for e in user])
-    salt = os.random(32)
+    salt = generate_salt(32)
     hashed_pass = hash_password(salt,password)
     cursor.execute("SELECT CITY_STATE_ZIP_ID FROM CITY_STATE_ZIP WHERE CITY = %s AND STATE = %s AND ZIPCODE = %s",
                    [city, state, zipcode])
     city_state_zip = cursor.fetchone()
     if city_state_zip == None:
-        user = User(1, "that city state or zip does not exist in our system")
+        user = [User(1, "that city state or zip does not exist in our system")]
         return jsonify([e.serialize() for e in user])
     cursor.execute(
         "SELECT PERSON_ID FROM PERSON WHERE FIRST_NAME= %s AND LAST_NAME = %s AND ADDRESS = %s AND  CITY_STATE_ZIP_ID = %s",
         [first_name, last_name, address, city_state_zip[0]])
     person = cursor.fetchone()
     if person == None:
-        user = User(1, "that person does not exist in our system")
+        user = [User(1, "that person does not exist in our system")]
         return jsonify([e.serialize() for e in user])
     cursor.execute("SELECT POSITION_ID FROM EMPLOYEE_POSITION WHERE POSITION_NAME = %s", [position_name])
     position = cursor.fetchone()
     if position == None:
-        user = User(1, "that position does not exist in our system")
+        user = [User(1, "that position does not exist in our system")]
         return jsonify([e.serialize() for e in user])
     cursor.execute("SELECT SALARIED_EMPLOYEE_ID FROM SALARIED_EMPLOYEE WHERE POSITION_ID = %s AND PERSON_ID = %s", [position, person])
     salaried_employee_id =  cursor.fetchone()
     if salaried_employee_id == None:
-        user = User(1, "that employee does not exist in our system")
+        user = [User(1, "that employee does not exist in our system")]
         return jsonify([e.serialize() for e in user])
     cursor.execute("INSERT INTO SITE_USER (SALARIED_EMPLOYEE_ID,USER_NAME,PASS_WORD,SALT) VALUES (%s,%s,%s,%s)", [salaried_employee_id,username,hashed_pass,salt])
     session['loggedin'] = True
     session['username'] = username
     session['position'] = position_name
-    user = User(1, username)
+    print(session['username'])
+    user = [User(1, username)]
     return jsonify([e.serialize() for e in user])
 
 @app.route("/flaskapi/login_user" , methods=["POST"], strict_slashes=False)
@@ -93,7 +103,7 @@ def login_user():
     cursor.execute("SELECT USER_ID FROM SITE_USER WHERE USER_NAME=%s", [username])
     user_exists = cursor.fetchone()
     if user_exists == None:
-        user = User(0, "that username does not exist in our system")
+        user = [User(0, "that username does not exist in our system")]
         return jsonify([e.serialize() for e in user])
 
     cursor.execute("SELECT SALT FROM SITE_USER WHERE USER_NAME = %s", [username])
@@ -104,7 +114,7 @@ def login_user():
 
     checked_pass = hash_password(salt,password)
     if hashed_pass != checked_pass:
-        user = User(1, "that password is not correct")
+        user = [User(1, "that password is not correct")]
         return jsonify([e.serialize() for e in user])
 
     cursor.execute("SELECT SALARIED_EMPLOYEE_ID FROM SITE_USER WHERE USER_NAME = %s", [username])
@@ -119,7 +129,7 @@ def login_user():
     session['loggedin'] = True
     session['username'] = username
     session['position'] = position
-    user = User(1, username)
+    user = [User(1, username)]
     return jsonify([e.serialize() for e in user])
 
 @app.route("/flaskapi/logout_user" , methods=["POST"], strict_slashes=False)
@@ -128,7 +138,7 @@ def logout_user():
     session.pop('loggedin', None)
     session.pop('username', None)
     session.pop('position', None)
-    user = User(1, "logged out")
+    user = [User(1, "logged out")]
     return jsonify([e.serialize() for e in user])
 
 

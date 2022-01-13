@@ -1,6 +1,6 @@
 export default class APIServiceNineteen{
     static CreateUser(body){
-    return fetch('http://localhost:5000/flaskapi/login_user',{
+    return fetch('http://localhost:5000/flaskapi/add_user',{
     'method': 'POST',
     headers : {
     'Content-Type' : 'application/json'},

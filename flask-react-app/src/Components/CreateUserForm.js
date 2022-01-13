@@ -11,13 +11,12 @@ const CreateUserForm = (props) => {
     const [city, setCity] = useState('')
     const [state, setState] = useState('')
     const [zipcode, setZipcode] = useState('')
-
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [users, setUsers] = useState('')
 
     const createUser = () =>{
-    APIServiceNineteen.CreateUser({username,password})
+    APIServiceNineteen.CreateUser({username,password,first_name,last_name,position_name,address,city,state,zipcode})
     .then((response) => setUsers(response))
           .catch(error => console.log('error',error))
           }

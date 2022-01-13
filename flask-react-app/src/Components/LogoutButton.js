@@ -8,7 +8,7 @@ const LogoutForm = (props) => {
     const [users, setUsers] = useState('')
 
     const logoutUser = () =>{
-    APIServiceTwenty.LoginUser({})
+    APIServiceTwenty.LogoutUser({})
     .then((response) => setUsers(response))
           .catch(error => console.log('error',error))
           }
@@ -21,7 +21,6 @@ const LogoutForm = (props) => {
       return (
            <div>
              <form onSubmit = {handleSubmit} >
-
                      <button
                      className="btn btn-primary mt-2"
                      >
