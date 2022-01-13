@@ -1043,7 +1043,7 @@ def add_job():
         jobs = [job]
         return jsonify([e.serialize() for e in jobs])
     else:
-        job = Jobs(1, "You are not a general manager and may not add new jobs", "You are not a general manager and may not add new jobs", start_date)
+        job = Jobs(1, "You are not a general manager and may not add new jobs", "You are not a general manager and may not add new jobs", 0)
         jobs = [job]
         return jsonify([e.serialize() for e in jobs])
 
@@ -1067,7 +1067,7 @@ def add_work_package():
         work_packages = [work_package]
         return jsonify([e.serialize() for e in work_packages])
     else:
-        work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", price_of_work, hours_alloted, hours_used)
+        work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", 0, 0, 0)
         work_packages = [work_package]
         return jsonify([e.serialize() for e in work_packages])
 
@@ -1092,7 +1092,7 @@ def delete_work_package():
             work_packages = [work_package]
             return jsonify([e.serialize() for e in work_packages])
     else:
-        work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", price_of_work, hours_alloted, hours_used)
+        work_package = WorkPackages(1, "You can't add work packages", "You can't add work packages", 0, 0, 0)
         work_packages = [work_package]
         return jsonify([e.serialize() for e in work_packages])
 
